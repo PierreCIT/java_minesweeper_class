@@ -68,45 +68,86 @@ public class Demineur extends JFrame {
         return started;
     }
 
+    /**
+     * Set if the game is started or not.
+     * @param started A boolean if true the game is started and the opposite otherwise.
+     */
     public void setStarted(boolean started) {
         this.started = started;
     }
 
     /**
      * Return the interface object
-     *
      * @return
      */
     public GUI getGui() {
         return this.panel;
     }
 
+    /**
+     *
+     * @return The game state.
+      */
     public boolean isLost() {
         return lost;
     }
 
+    /**
+     * Set the game state to the given value. True means lost false means the game keeps going.
+     * @param lost A boolean representing the game state (alive or dead).
+     */
     public void setLost(boolean lost) {
         this.lost = lost;
     }
 
+    /**
+     * Set the attribute variable which represents the number of clicked cases to the given number.
+     * @param nbCaseClicked Value to set the number of cases clicked to.
+     */
     public void setNbCaseClicked(int nbCaseClicked) {
         this.nbCaseClicked = nbCaseClicked;
     }
 
+    /**
+     *
+     * @return the number of cases clicked.
+     */
     public int getNbCaseClicked() {
         return this.nbCaseClicked;
     }
 
+    /**
+     * By computing the number of discovered cases and comparing to the total number of cases and mines
+     * tests if the game is win.
+     * @return true if the game is won, false otherwise.
+     */
     public boolean isWin() {
         return getNbCaseClicked() + getChamp().getNbMines() == getChamp().getDimY() * getChamp().getDimX();
     }
 
+    /**
+     * Reset the game when the level has to be same as the previous one in the next game.
+     */
     public void newGame(){
         setStarted(false);
         setLost(false);
         setNbCaseClicked(0);
     }
 
+    /**
+     * Rest the game and set the level to the leveled passed in parameters
+     * @param level Level of the new game.
+     */
+    public void newGame(Level level){
+        this.level = level;
+        setStarted(false);
+        setLost(false);
+        setNbCaseClicked(0);
+    }
+
+    /**
+     * Function that will save the game score into a file.
+     */
     public void saveScore() {
         Path path = Paths.get(FILENAME);
 

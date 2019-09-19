@@ -195,7 +195,7 @@ public class GUI extends JPanel implements ActionListener {
         placeCases();
         main.pack();
         compteur.stopCpt();
-        main.newGame();
+        main.newGame(level);
     }
 
     public Compteur getCompteur() {
