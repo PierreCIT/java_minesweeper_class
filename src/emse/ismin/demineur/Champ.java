@@ -9,10 +9,10 @@ import java.util.Random;
  */
 
 public class Champ {
-    private static final int DIMEASY = 3;
+    private static final int DIMEASY = 5;
     private static final int DIMMEDIUM = 20;
     private static final int DIMHARD = 30;
-    private static final int NBMINESEASY = 5;
+    private static final int NBMINESEASY = 3;
     private static final int NBMINESMEDIUM = 30;
     private static final int NBMINESHARD = 70;
     public Level level;
