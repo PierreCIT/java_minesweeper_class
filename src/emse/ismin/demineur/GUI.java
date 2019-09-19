@@ -13,7 +13,8 @@ public class GUI extends JPanel implements ActionListener {
     private JButton butRestart;
     private JLabel lab;
     private JPanel northPanel;
-    private JPanel gridPannel = new JPanel();;
+    private JPanel gridPannel = new JPanel();
+    ;
     private JPanel ButtonSouth;
     private JMenuItem mQuitter;
     private JMenuItem mAbout;
@@ -151,7 +152,7 @@ public class GUI extends JPanel implements ActionListener {
         }
     }
 
-    private void placeCases(){
+    private void placeCases() {
         gridPannel.setLayout(new GridLayout(main.getChamp().getDimX(), main.getChamp().getDimY()));
         add(gridPannel, BorderLayout.CENTER);
 
@@ -165,7 +166,7 @@ public class GUI extends JPanel implements ActionListener {
     }
 
     /**
-     * Asked to all cases to start a new party
+     * Asked to all cases to start to reinitialize. (The mine position is not changed here)
      */
     private void newParty() {
         for (int x = 0; x < main.getChamp().getDimX(); x++) {
@@ -176,20 +177,47 @@ public class GUI extends JPanel implements ActionListener {
         compteur.stopCpt();
         main.newGame();
     }
+
     /**
-     * Asked to all cases to start a new party
+     * Asked to all cases to start a new party, and reposition the mines.
      * Take as input level when the new game is to be launch with a new level.
      */
     public void newParty(Level level) {
         gridPannel.removeAll();
+        main.getChamp().newParty(level);
         placeCases();
         main.pack();
         compteur.stopCpt();
         main.newGame();
     }
 
-    public Compteur getCompteur(){
+    public Compteur getCompteur() {
         return compteur;
+    }
+
+    /**
+     * Will see if the adjacent cases are of the same value of the one clicked and if it is set
+     * these cases to clicked through the method setClickedTrue.
+     * The given case at the position x,y is already set to be clicked.
+     */
+    public void adjacentSameValue(int x, int y){
+        int borneInfX = x == 0 ? 0 : -1;
+        int borneSupX = x == main.getChamp().getDimX() - 1 ? 0 : 1;
+        int borneInfY = y == 0 ? 0 : -1;
+        int borneSupY = y == main.getChamp().getDimY()  - 1 ? 0 : 1;
+
+        for (int i = borneInfX; i <= borneSupX; i++) {
+            for (int k = borneInfY; k <= borneSupY; k++) {
+                if (!(i == 0 && k == 0)) { //We don't count the mine itself
+                    if (!tabCase[x+i][y+k].getClicked()) { //If the case is not already clicked
+                        tabCase[x+i][y+k].setClickedTrue();
+                        if(main.getChamp().numberMinesSurrounding(x+i,y+k)==0){
+                            adjacentSameValue(x+i,y+k);
+                        }
+                    }
+                }
+            }
+        }
     }
 
 }

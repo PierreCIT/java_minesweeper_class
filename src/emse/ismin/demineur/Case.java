@@ -105,6 +105,9 @@ class Case extends JPanel implements MouseListener {
         return resultColor;
     }
 
+    /**
+     * Set the value of clicked to false and repaint the component.
+     */
     public void newParty() {
         clicked = false;
         repaint();
@@ -130,6 +133,7 @@ class Case extends JPanel implements MouseListener {
                 demin.setStarted(true);
             }
             repaint(); //Force the call to paintComponents (default behavior)
+
             if (demin.getChamp().isMine(x, y)) {
                 demin.setLost(true);
                 demin.getGui().getCompteur().stopCpt();
@@ -137,6 +141,11 @@ class Case extends JPanel implements MouseListener {
                         JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE);
                 if (rep == JOptionPane.YES_OPTION) {
                     demin.getGui().newParty(demin.level);
+                }
+            } else {
+                //If the case clicked is empty without close bombs then we call the function to show all adjacentValues
+                if (demin.getChamp().getValeurChamp(x, y).equals("0")) {
+                    demin.getGui().adjacentSameValue(x, y);
                 }
             }
             if (demin.isWin()) {
@@ -166,5 +175,22 @@ class Case extends JPanel implements MouseListener {
     @Override
     public void mouseExited(MouseEvent e) {
 
+    }
+
+    /**
+     * Will always set the clicked attribute to true set the number of clicked cases to plus 1
+     * And ask for a repaint.
+     */
+    public void setClickedTrue() {
+        clicked = true;
+        demin.setNbCaseClicked(demin.getNbCaseClicked() + 1);
+        repaint();
+    }
+
+    /**
+     * Return if the case was clicked.
+     */
+    public boolean getClicked() {
+        return clicked;
     }
 }
