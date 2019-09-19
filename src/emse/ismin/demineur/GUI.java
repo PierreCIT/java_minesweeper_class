@@ -11,9 +11,11 @@ public class GUI extends JPanel implements ActionListener {
     private Demineur main;
     private JButton butQuit;
     private JButton butRestart;
-    private JLabel lab;
+    private JLabel labWelcom;
+    private JLabel labScoreLevel;
     private JPanel northPanel;
-    private JPanel gridPannel = new JPanel();;
+    private JPanel gridPannel = new JPanel();
+    ;
     private JPanel ButtonSouth;
     private JMenuItem mQuitter;
     private JMenuItem mAbout;
@@ -30,15 +32,21 @@ public class GUI extends JPanel implements ActionListener {
      */
     public GUI(Demineur main) {
         this.main = main;
-        setLayout(new BorderLayout());
-        northPanel = new JPanel();
-        lab = new JLabel("Welcome on the connected deminor ! Score : " + main.score + " , Level : " + main.level, SwingConstants.CENTER);
         //Compteur
         compteur = new Compteur();
-        northPanel.add(lab);
-        northPanel.add(compteur);
-        this.add(northPanel, BorderLayout.NORTH);
 
+        setLayout(new BorderLayout());
+        northPanel = new JPanel();
+
+        //NorthPanel's label
+        labWelcom = new JLabel("Welcome on the connected Minesweeper !");
+        labScoreLevel = new JLabel("Score : " + main.score + " , Level : " + main.level, SwingConstants.CENTER);
+        northPanel.add(labWelcom);
+        northPanel.add(compteur); //Adding compteur to northPanel
+        northPanel.add(labScoreLevel);
+        labWelcom.setFont(new Font("Papyrus", Font.ITALIC, 12));
+        labScoreLevel.setFont(new Font("Papyrus", Font.ITALIC, 12));
+        this.add(northPanel, BorderLayout.NORTH);
 
         setVisible(true);
 
@@ -46,17 +54,17 @@ public class GUI extends JPanel implements ActionListener {
 
         //Button Quit
         butQuit = new JButton("Quit");
-        butQuit.setForeground(Color.blue);
-        butQuit.setBackground(Color.orange);
+        butQuit.setForeground(Color.white);
+        butQuit.setBackground(Color.darkGray);
         butQuit.addActionListener(this);
-        lab.setFont(new Font("Papyrus", Font.ITALIC, 12));
+        butQuit.setFont(new Font("Papyrus", Font.ITALIC, 12));
 
         //Button Restart
         butRestart = new JButton("Restart game");
-        butRestart.setForeground(Color.WHITE);
+        butRestart.setForeground(Color.white);
         butRestart.setBackground(Color.darkGray);
         butRestart.addActionListener(this);
-        lab.setFont(new Font("Papyrus", Font.ITALIC, 12));
+        butRestart.setFont(new Font("Papyrus", Font.ITALIC, 12));
 
         //Button at the bottom of the grid
         ButtonSouth = new JPanel();
@@ -151,7 +159,7 @@ public class GUI extends JPanel implements ActionListener {
         }
     }
 
-    private void placeCases(){
+    private void placeCases() {
         gridPannel.setLayout(new GridLayout(main.getChamp().getDimX(), main.getChamp().getDimY()));
         add(gridPannel, BorderLayout.CENTER);
 
@@ -176,6 +184,7 @@ public class GUI extends JPanel implements ActionListener {
         compteur.stopCpt();
         main.newGame();
     }
+
     /**
      * Asked to all cases to start a new party
      * Take as input level when the new game is to be launch with a new level.
@@ -188,7 +197,7 @@ public class GUI extends JPanel implements ActionListener {
         main.newGame();
     }
 
-    public Compteur getCompteur(){
+    public Compteur getCompteur() {
         return compteur;
     }
 

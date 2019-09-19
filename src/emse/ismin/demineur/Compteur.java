@@ -10,7 +10,7 @@ public class Compteur extends JPanel implements Runnable {
 
 
     Compteur() {
-        setPreferredSize(new Dimension(35, 25)); //Size of the case
+        setPreferredSize(new Dimension(50, 25)); //Size of the case
     }
 
     @Override
@@ -35,7 +35,7 @@ public class Compteur extends JPanel implements Runnable {
         gc.fillRect(0, 0, getWidth(), getHeight());
         gc.setColor(new Color(200, 0, 0));
         gc.setFont(new Font("default", Font.BOLD, 16));
-        gc.drawString(String.valueOf(score), (getWidth() / 2) - 2, (getHeight() / 2) + 5);
+        gc.drawString(String.valueOf(score), (getWidth() / 2) - 6, (getHeight() / 2) + 5);
     }
 
     /**
