@@ -8,7 +8,7 @@ import java.awt.event.ActionListener;
 public class GUIServer extends JPanel implements ActionListener {
     private ServeurDemineur main;
     private JButton startB; // Button to use to start the server
-    private JTextArea dialog = new JTextArea(20,20); // Dialog/log's server information
+    private JTextArea dialog = new JTextArea(20,35); // Dialog/log's server information
 
 
     public GUIServer(ServeurDemineur server){

@@ -32,6 +32,7 @@ public class GUI extends JPanel implements ActionListener {
     private TextField nicknameTF; //Player's nickname
     private JButton coDiscoButton; // Button that will be used to either connect or disconnect from server
     private JPanel connectPanel; //Panel that will contain connection components
+    private TextArea msgServer = new TextArea(5, 30); //Text area in which messages from the server will be printed
 
     /**
      * Create the pannels information inside the frame
@@ -93,6 +94,7 @@ public class GUI extends JPanel implements ActionListener {
         //Button at the bottom of the grid
         //Game state fetaures
         ButtonSouth = new JPanel();
+        ButtonSouth.add(msgServer);
         ButtonSouth.add(butRestart);
         ButtonSouth.add(butQuit);
         this.add(ButtonSouth, BorderLayout.SOUTH);
@@ -181,8 +183,8 @@ public class GUI extends JPanel implements ActionListener {
         } else if (e.getSource() == mHard) {
             main.getChamp().newParty(Level.HARD);
             newParty(Level.HARD);
-        }else if (e.getSource() == coDiscoButton)
-            if(!main.connected)
+        } else if (e.getSource() == coDiscoButton)
+            if (!main.connected)
                 main.connectServer(ipTF.getText(), Integer.parseInt(portTF.getText()), nicknameTF.getText());
             else
                 main.disconnect();
@@ -236,19 +238,19 @@ public class GUI extends JPanel implements ActionListener {
      * these cases to clicked through the method setClickedTrue.
      * The given case at the position x,y is already set to be clicked.
      */
-    public void adjacentSameValue(int x, int y){
+    public void adjacentSameValue(int x, int y) {
         int borneInfX = x == 0 ? 0 : -1;
         int borneSupX = x == main.getChamp().getDimX() - 1 ? 0 : 1;
         int borneInfY = y == 0 ? 0 : -1;
-        int borneSupY = y == main.getChamp().getDimY()  - 1 ? 0 : 1;
+        int borneSupY = y == main.getChamp().getDimY() - 1 ? 0 : 1;
 
         for (int i = borneInfX; i <= borneSupX; i++) {
             for (int k = borneInfY; k <= borneSupY; k++) {
                 if (!(i == 0 && k == 0)) { //We don't count the mine itself
-                    if (!tabCase[x+i][y+k].getClicked()) { //If the case is not already clicked
-                        tabCase[x+i][y+k].setClickedTrue();
-                        if(main.getChamp().numberMinesSurrounding(x+i,y+k)==0){
-                            adjacentSameValue(x+i,y+k);
+                    if (!tabCase[x + i][y + k].getClicked()) { //If the case is not already clicked
+                        tabCase[x + i][y + k].setClickedTrue();
+                        if (main.getChamp().numberMinesSurrounding(x + i, y + k) == 0) {
+                            adjacentSameValue(x + i, y + k);
                         }
                     }
                 }
@@ -256,12 +258,16 @@ public class GUI extends JPanel implements ActionListener {
         }
     }
 
-    public void coDecoButtonChangeText(){
-        if(main.connected)
+    public void coDecoButtonChangeText() {
+        if (main.connected)
             coDiscoButton.setText("Disconnect");
         else
             coDiscoButton.setText("  Connect  ");
         coDiscoButton.repaint();
+    }
+
+    public void addMsgGui(String msg) {
+        msgServer.append(msg + "\n");
     }
 
 }

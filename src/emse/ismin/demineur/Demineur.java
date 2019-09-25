@@ -13,7 +13,7 @@ import java.nio.file.Paths;
  * <p>Projet de démineur connecté</p>
  */
 
-public class Demineur extends JFrame implements Runnable{
+public class Demineur extends JFrame implements Runnable {
     public final static String FILENAME = "score.dat";
     public int score = 20;
     public Level level = Level.EASY;
@@ -25,12 +25,12 @@ public class Demineur extends JFrame implements Runnable{
     //Connection
     public String ipDefault = "127.0.0.1";
     public int portDefault = 10000;
-    public boolean connected= false;
+    public boolean connected = false;
     private Socket sock;
     private DataOutputStream out;
     private DataInputStream in;
     private Thread process; //Thread that will listen for server messages
-    private int commmand; // Integer that will receive commands from the server
+    private String commmand; // String that will receive commands from the server
 
     /**
      * Constructor of the Demineur which will initialize the game
@@ -79,6 +79,7 @@ public class Demineur extends JFrame implements Runnable{
 
     /**
      * Set if the game is started or not.
+     *
      * @param started A boolean if true the game is started and the opposite otherwise.
      */
     public void setStarted(boolean started) {
@@ -87,6 +88,7 @@ public class Demineur extends JFrame implements Runnable{
 
     /**
      * Return the interface object
+     *
      * @return
      */
     public GUI getGui() {
@@ -94,15 +96,15 @@ public class Demineur extends JFrame implements Runnable{
     }
 
     /**
-     *
      * @return The game state.
-      */
+     */
     public boolean isLost() {
         return lost;
     }
 
     /**
      * Set the game state to the given value. True means lost false means the game keeps going.
+     *
      * @param lost A boolean representing the game state (alive or dead).
      */
     public void setLost(boolean lost) {
@@ -111,6 +113,7 @@ public class Demineur extends JFrame implements Runnable{
 
     /**
      * Set the attribute variable which represents the number of clicked cases to the given number.
+     *
      * @param nbCaseClicked Value to set the number of cases clicked to.
      */
     public void setNbCaseClicked(int nbCaseClicked) {
@@ -118,7 +121,6 @@ public class Demineur extends JFrame implements Runnable{
     }
 
     /**
-     *
      * @return the number of cases clicked.
      */
     public int getNbCaseClicked() {
@@ -128,6 +130,7 @@ public class Demineur extends JFrame implements Runnable{
     /**
      * By computing the number of discovered cases and comparing to the total number of cases and mines
      * tests if the game is win.
+     *
      * @return true if the game is won, false otherwise.
      */
     public boolean isWin() {
@@ -137,7 +140,7 @@ public class Demineur extends JFrame implements Runnable{
     /**
      * Reset the game when the level has to be same as the previous one in the next game.
      */
-    public void newGame(){
+    public void newGame() {
         setStarted(false);
         setLost(false);
         setNbCaseClicked(0);
@@ -145,9 +148,10 @@ public class Demineur extends JFrame implements Runnable{
 
     /**
      * Rest the game and set the level to the leveled passed in parameters
+     *
      * @param level Level of the new game.
      */
-    public void newGame(Level level){
+    public void newGame(Level level) {
         this.level = level;
         setStarted(false);
         setLost(false);
@@ -160,20 +164,20 @@ public class Demineur extends JFrame implements Runnable{
     public void saveScore() {
         Path path = Paths.get(FILENAME);
 
-        if(!Files.exists(path)){
-            for(int i=0; i<Level.values().length;i++){
+        if (!Files.exists(path)) {
+            for (int i = 0; i < Level.values().length; i++) {
             }
         }
     }
 
-    public void connectServer(String ip, int port, String nickname){
-        try{
+    public void connectServer(String ip, int port, String nickname) {
+        try {
             sock = new Socket(ip, port);
-            out= new DataOutputStream(sock.getOutputStream());
+            out = new DataOutputStream(sock.getOutputStream());
             in = new DataInputStream(sock.getInputStream());
-            if(nickname.length()>0){
+            if (nickname.length() > 0) {
                 out.writeUTF(nickname);
-            }else{
+            } else {
                 out.writeUTF("DefaultNickname");
             }
             connected = true;
@@ -181,28 +185,30 @@ public class Demineur extends JFrame implements Runnable{
             process = new Thread(this);
             process.start();
         } catch (UnknownHostException e) {
-            System.out.println("Impossible to connect to "+ip+":"+port+" with nickname:"+nickname);
-            JOptionPane.showConfirmDialog(null, "Impossible to connect to "+ip+":"+port+" with nickname:"+nickname, "Close confirmation",
+            System.out.println("Impossible to connect to " + ip + ":" + port + " with nickname:" + nickname);
+            JOptionPane.showConfirmDialog(null, "Impossible to connect to " + ip + ":" + port + " with nickname:" + nickname, "Close confirmation",
                     JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
         } catch (IOException e) {
-            System.out.println("Impossible to connect to "+ip+":"+port+" with nickname:"+nickname);
-            JOptionPane.showConfirmDialog(null, "Impossible to connect to "+ip+":"+port+" with nickname:"+nickname, "Close confirmation",
+            System.out.println("Impossible to connect to " + ip + ":" + port + " with nickname:" + nickname);
+            JOptionPane.showConfirmDialog(null, "Impossible to connect to " + ip + ":" + port + " with nickname:" + nickname, "Close confirmation",
                     JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
         }
     }
 
     public void disconnect() {
-        connected =false;
-        try{
-        in.close();
-        out.close();
-        sock.close();
-        System.out.println("Disconnected from server.\n");
-        panel.coDecoButtonChangeText();
+        connected = false;
+        try {
+            in.close();
+            out.close();
+            sock.close();
+            System.out.println("Disconnected from server.\n");
+            panel.coDecoButtonChangeText();
+            process=null; //We kill the process that was waiting for messages from the server
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        catch (IOException e){e.printStackTrace();}
     }
 
     @Override
@@ -213,14 +219,43 @@ public class Demineur extends JFrame implements Runnable{
         //lecture de la commande
         //en fct de la datareceived on affiche/mines ...
         //lecture du joueur qui a cliqué en XY
-        while(process!=null){
+        while (process != null) {
             try {
-                commmand = in.readInt();
+                commmand = in.readUTF();
+                processCommands(commmand);
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            
+
         }
+    }
+
+    /**
+     * From the command given in parameters will select what action to do
+     *
+     * @param cmd A string which must corresponds to one of the possibilities of the command ENUM
+     */
+    private void processCommands(String cmd) {
+        switch (cmd) {
+            case "MSG":
+                readAndPrintServerMessage();
+                break;
+            case "POSITION":
+            default:
+                System.out.println("Erreur: command from server not understood.\n");
+                panel.addMsgGui("Erreur: command from server not understood.");
+        }
+    }
+
+    private void readAndPrintServerMessage() {
+        try {
+            String msg = in.readUTF();
+            panel.addMsgGui(msg);
+        } catch (IOException e) {
+            System.out.println("Error when receiving server data about 'message'.");
+            panel.addMsgGui("Error when receiving server data about 'message'.");
+        }
+
 
     }
 }
