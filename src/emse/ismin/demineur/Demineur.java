@@ -1,9 +1,9 @@
 package emse.ismin.demineur;
 
 import javax.swing.*;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.net.Socket;
+import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -22,6 +22,13 @@ public class Demineur extends JFrame {
     private GUI panel;
     private boolean lost;
     private int nbCaseClicked = 0;
+    //Connection
+    public String ipDefault = "127.0.0.1";
+    public int portDefault = 10000;
+    public boolean connected= false;
+    Socket sock;
+    DataOutputStream out;
+    DataInputStream in;
 
     /**
      * Constructor of the Demineur which will initialize the game
@@ -155,6 +162,37 @@ public class Demineur extends JFrame {
             for(int i=0; i<Level.values().length;i++){
             }
         }
+    }
+
+    public void connectServer(String ip, int port, String nickname){
+        try{
+            sock = new Socket(ip, port);
+            out= new DataOutputStream(sock.getOutputStream());
+            in = new DataInputStream(sock.getInputStream());
+            if(nickname.length()>0){
+                out.writeUTF(nickname);
+            }else{
+                out.writeUTF("DefaultNickname");
+            }
+            connected = true;
+            panel.coDecoButtonChangeText();
+        } catch (UnknownHostException e) {
+            System.out.println("Impossible to connect to "+ip+":"+port+" with nickname:"+nickname);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void disconnect() {
+        connected =false;
+        try{
+        in.close();
+        out.close();
+        sock.close();
+        System.out.println("Disconnected from server.\n");
+        panel.coDecoButtonChangeText();
+        }
+        catch (IOException e){e.printStackTrace();}
     }
 }
 

@@ -5,6 +5,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.net.ConnectException;
 
 
 public class GUI extends JPanel implements ActionListener {
@@ -15,7 +16,7 @@ public class GUI extends JPanel implements ActionListener {
     private JLabel labScoreLevel;
     private JPanel northPanel;
     private JPanel gridPannel = new JPanel();
-    ;
+
     private JPanel ButtonSouth;
     private JMenuItem mQuitter;
     private JMenuItem mAbout;
@@ -24,6 +25,13 @@ public class GUI extends JPanel implements ActionListener {
     private JMenuItem mHard;
     private Case[][] tabCase; //Array that will store the cases in the gridLayer
     private Compteur compteur;
+
+    //Connection features
+    private TextField ipTF; //IP server to connect to
+    private TextField portTF; //Server's port to connect to
+    private TextField nicknameTF; //Player's nickname
+    private JButton coDiscoButton; // Button that will be used to either connect or disconnect from server
+    private JPanel connectPanel; //Panel that will contain connection components
 
     /**
      * Create the pannels information inside the frame
@@ -41,11 +49,27 @@ public class GUI extends JPanel implements ActionListener {
         //NorthPanel's label
         labWelcom = new JLabel("Welcome on the connected Minesweeper !");
         labScoreLevel = new JLabel("Score : " + main.score + " , Level : " + main.level, SwingConstants.CENTER);
-        northPanel.add(labWelcom);
-        northPanel.add(compteur); //Adding compteur to northPanel
-        northPanel.add(labScoreLevel);
+        northPanel.setLayout(new BorderLayout());
+        northPanel.add(labWelcom, BorderLayout.NORTH);
+        northPanel.add(compteur, BorderLayout.NORTH); //Adding compteur to northPanel
+        northPanel.add(labScoreLevel, BorderLayout.NORTH);
         labWelcom.setFont(new Font("Papyrus", Font.ITALIC, 12));
         labScoreLevel.setFont(new Font("Papyrus", Font.ITALIC, 12));
+
+        //Connection features
+        connectPanel = new JPanel();
+        ipTF = new TextField(main.ipDefault);
+        portTF = new TextField(String.valueOf(main.portDefault));
+        nicknameTF = new TextField("nickname", 10);
+        coDiscoButton = new JButton("  Connect  ");
+        coDiscoButton.addActionListener(this);
+        connectPanel.add(ipTF);
+        connectPanel.add(portTF);
+        connectPanel.add(nicknameTF);
+        connectPanel.add(coDiscoButton);
+        northPanel.add(connectPanel, BorderLayout.SOUTH);
+
+
         this.add(northPanel, BorderLayout.NORTH);
 
         setVisible(true);
@@ -67,6 +91,7 @@ public class GUI extends JPanel implements ActionListener {
         butRestart.setFont(new Font("Papyrus", Font.ITALIC, 12));
 
         //Button at the bottom of the grid
+        //Game state fetaures
         ButtonSouth = new JPanel();
         ButtonSouth.add(butRestart);
         ButtonSouth.add(butQuit);
@@ -156,7 +181,11 @@ public class GUI extends JPanel implements ActionListener {
         } else if (e.getSource() == mHard) {
             main.getChamp().newParty(Level.HARD);
             newParty(Level.HARD);
-        }
+        }else if (e.getSource() == coDiscoButton)
+            if(!main.connected)
+                main.connectServer(ipTF.getText(), Integer.parseInt(portTF.getText()), nicknameTF.getText());
+            else
+                main.disconnect();
     }
 
     private void placeCases() {
@@ -225,6 +254,14 @@ public class GUI extends JPanel implements ActionListener {
                 }
             }
         }
+    }
+
+    public void coDecoButtonChangeText(){
+        if(main.connected)
+            coDiscoButton.setText("Disconnect");
+        else
+            coDiscoButton.setText("  Connect  ");
+        coDiscoButton.repaint();
     }
 
 }
