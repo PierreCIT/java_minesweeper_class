@@ -13,7 +13,7 @@ import java.nio.file.Paths;
  * <p>Projet de démineur connecté</p>
  */
 
-public class Demineur extends JFrame {
+public class Demineur extends JFrame implements Runnable{
     public final static String FILENAME = "score.dat";
     public int score = 20;
     public Level level = Level.EASY;
@@ -26,9 +26,11 @@ public class Demineur extends JFrame {
     public String ipDefault = "127.0.0.1";
     public int portDefault = 10000;
     public boolean connected= false;
-    Socket sock;
-    DataOutputStream out;
-    DataInputStream in;
+    private Socket sock;
+    private DataOutputStream out;
+    private DataInputStream in;
+    private Thread process; //Thread that will listen for server messages
+    private int commmand; // Integer that will receive commands from the server
 
     /**
      * Constructor of the Demineur which will initialize the game
@@ -176,9 +178,17 @@ public class Demineur extends JFrame {
             }
             connected = true;
             panel.coDecoButtonChangeText();
+            process = new Thread(this);
+            process.start();
         } catch (UnknownHostException e) {
             System.out.println("Impossible to connect to "+ip+":"+port+" with nickname:"+nickname);
+            JOptionPane.showConfirmDialog(null, "Impossible to connect to "+ip+":"+port+" with nickname:"+nickname, "Close confirmation",
+                    JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
         } catch (IOException e) {
+            System.out.println("Impossible to connect to "+ip+":"+port+" with nickname:"+nickname);
+            JOptionPane.showConfirmDialog(null, "Impossible to connect to "+ip+":"+port+" with nickname:"+nickname, "Close confirmation",
+                    JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
         }
     }
@@ -193,6 +203,25 @@ public class Demineur extends JFrame {
         panel.coDecoButtonChangeText();
         }
         catch (IOException e){e.printStackTrace();}
+    }
+
+    @Override
+    public void run() {
+        //boucle infini
+
+        //lecture dans in
+        //lecture de la commande
+        //en fct de la datareceived on affiche/mines ...
+        //lecture du joueur qui a cliqué en XY
+        while(process!=null){
+            try {
+                commmand = in.readInt();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            
+        }
+
     }
 }
 

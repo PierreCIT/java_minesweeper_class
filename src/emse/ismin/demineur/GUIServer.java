@@ -27,7 +27,7 @@ public class GUIServer extends JPanel implements ActionListener {
     }
 
     public void addDialogText(String newMsg){
-        dialog.append(newMsg);
+        dialog.append(newMsg+"\n");
     }
 
     @Override
