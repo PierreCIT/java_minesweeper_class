@@ -18,9 +18,10 @@ class Case extends JPanel implements MouseListener {
     private int x;
     private int y;
     private Demineur demin;
+    private int value = 0; //Only used when playing online. It will contain the value to show or mines if -1
 
     private final static int GRAY = 0x9E9E9E; //0
-    private final static int GREEN = 0x9FFF33; //1
+    private final static int BLUE = 0x1547EB; //1
     private final static int DARKGREEN = 0x78C324; //2
     private final static int YELLOW = 0xC7E41C; //3
     private final static int DARKYELLOW = 0xE3CF15; //4
@@ -48,19 +49,37 @@ class Case extends JPanel implements MouseListener {
             gc.setColor(new Color(100, 100, 100));
             gc.fillRect(1, 1, getWidth(), getHeight());
         } else {
-            if (demin.getChamp().isMine(x, y)) {
-                try {
-                    BufferedImage image = ImageIO.read(new File("img/bomb.png"));
-                    gc.drawImage(image, 3, 3, getWidth() - 3, getHeight() - 3, this);
-                } catch (IOException e) {
-                    e.printStackTrace();
+            if (!demin.isOnlineGame()) { //Behavior when in local mode
+                if (demin.getChamp().isMine(x, y)) {
+                    try {
+                        BufferedImage image = ImageIO.read(new File("img/bomb.png"));
+                        gc.drawImage(image, 3, 3, getWidth() - 3, getHeight() - 3, this);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    gc.setColor(new Color(handleColor(Integer.parseInt(demin.getChamp().getValeurChamp(x, y)))));
+                    gc.fillRect(0, 0, getWidth(), getHeight());
+                    gc.setColor(new Color(0, 0, 0));
+                    if (Integer.parseInt(demin.getChamp().getValeurChamp(x, y)) != 0) {
+                        gc.drawString(demin.getChamp().getValeurChamp(x, y), getHeight() / 2, getWidth() / 2);
+                    }
                 }
-            } else {
-                gc.setColor(new Color(handleColor(Integer.parseInt(demin.getChamp().getValeurChamp(x, y)))));
-                gc.fillRect(0, 0, getWidth(), getHeight());
-                gc.setColor(new Color(0, 0, 0));
-                if (Integer.parseInt(demin.getChamp().getValeurChamp(x, y)) != 0) {
-                    gc.drawString(demin.getChamp().getValeurChamp(x, y), getHeight() / 2, getWidth() / 2);
+            } else { //Behavior when in online mode.
+                if(value == -1){
+                    try {
+                        BufferedImage image = ImageIO.read(new File("img/bomb.png"));
+                        gc.drawImage(image, 3, 3, getWidth() - 3, getHeight() - 3, this);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }else{
+                    gc.setColor(new Color(handleColor(value)));
+                    gc.fillRect(0, 0, getWidth(), getHeight());
+                    gc.setColor(new Color(0, 0, 0));
+                    if (value != 0) {
+                        gc.drawString(String.valueOf(value), getHeight() / 2, getWidth() / 2);
+                    }
                 }
             }
         }
@@ -73,7 +92,7 @@ class Case extends JPanel implements MouseListener {
                 resultColor = GRAY;
                 break;
             case 1:
-                resultColor = GREEN;
+                resultColor = BLUE;
                 break;
             case 2:
                 resultColor = DARKGREEN;
@@ -123,42 +142,47 @@ class Case extends JPanel implements MouseListener {
      */
     @Override
     public void mousePressed(MouseEvent e) {
-        if (!demin.isLost()) {
-            if (!clicked) {
-                demin.setNbCaseClicked(demin.getNbCaseClicked() + 1);
-            }
-            clicked = true;
-            if (!demin.isStarted()) {
-                demin.getGui().getCompteur().startCpt();
-                demin.setStarted(true);
-            }
-            repaint(); //Force the call to paintComponents (default behavior)
+        if (!demin.isOnlineGame()) { //Behavior when in local game mode.
+            if (!demin.isLost()) {
+                if (!clicked) {
+                    demin.setNbCaseClicked(demin.getNbCaseClicked() + 1);
+                }
+                clicked = true;
+                if (!demin.isStarted()) {
+                    demin.getGui().getCompteur().startCpt();
+                    demin.setStarted(true);
+                }
+                repaint(); //Force the call to paintComponents (default behavior)
 
-            if (demin.getChamp().isMine(x, y)) {
-                demin.setLost(true);
-                demin.getGui().getCompteur().stopCpt();
-                int rep = JOptionPane.showConfirmDialog(null, "BOOM ! GAME OVER ! Try again ! ", "Game Over",
-                        JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE);
-                if (rep == JOptionPane.YES_OPTION) {
-                    demin.getGui().newGame(demin.level);
+                if (demin.getChamp().isMine(x, y)) {
+                    demin.setLost(true);
+                    demin.getGui().getCompteur().stopCpt();
+                    int rep = JOptionPane.showConfirmDialog(null, "BOOM ! GAME OVER ! Try " +
+                                    "again ! ", "Game Over",
+                            JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE);
+                    if (rep == JOptionPane.YES_OPTION) {
+                        demin.getGui().newGame(demin.level);
+                    }
+                } else {
+                    //If the case clicked is empty without close bombs then we call the function to show all adjacentValues
+                    if (demin.getChamp().getValeurChamp(x, y).equals("0")) {
+                        demin.getGui().adjacentSameValue(x, y);
+                    }
                 }
-            } else {
-                //If the case clicked is empty without close bombs then we call the function to show all adjacentValues
-                if (demin.getChamp().getValeurChamp(x, y).equals("0")) {
-                    demin.getGui().adjacentSameValue(x, y);
+                if (demin.isWin()) {
+                    demin.getGui().getCompteur().stopCpt();
+                    int rep = JOptionPane.showConfirmDialog(null, "Congratulations ! You WIN " +
+                                    "!!! \nYour score is " + demin.getGui().getCompteur().getScore() +
+                                    "\nWould you like to restart ?", "Congratulations",
+                            JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
+                    if (rep == JOptionPane.YES_OPTION) {
+                        demin.getGui().newGame(demin.level);
+                    }
+                    demin.saveScore();
                 }
             }
-            if (demin.isWin()) {
-                demin.getGui().getCompteur().stopCpt();
-                int rep = JOptionPane.showConfirmDialog(null, "Congratulations ! You WIN !!! \n" +
-                                "Your score is " + demin.getGui().getCompteur().getScore() +
-                                "\nWould you like to restart ?", "Congratulations",
-                        JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
-                if (rep == JOptionPane.YES_OPTION) {
-                    demin.getGui().newGame(demin.level);
-                }
-                demin.saveScore();
-            }
+        } else { //Behavior in online game mode.
+            demin.sendClick(x, y);
         }
     }
 
@@ -192,5 +216,11 @@ class Case extends JPanel implements MouseListener {
      */
     public boolean getClicked() {
         return clicked;
+    }
+
+    public void setClickedTrueAndValue(int value){
+        clicked = true;
+        this.value = value;
+        repaint();
     }
 }

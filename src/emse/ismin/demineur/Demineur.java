@@ -9,10 +9,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
- * @author Pierre
- * <p>Projet de démineur connecté</p>
+ * Class that will handle local and online game of the MinesWeeper
  */
-
 public class Demineur extends JFrame implements Runnable {
     public final static String FILENAME = "score.dat";
     public int score = 20;
@@ -33,9 +31,10 @@ public class Demineur extends JFrame implements Runnable {
     private String commmand; // String that will receive commands from the server
     //Online game
     private boolean gameStarted = false; //Boolean that describes the state of the online game
+    private boolean onlineGame = false; //Boolean that set is the game is to be played with a server or in local.
 
     /**
-     * Constructor of the Demineur which will initialize the game
+     * Constructor of the 'Demineur' (MinesWeeper) which will initialize the game
      */
     public Demineur() {
         super("Demineur connecté");
@@ -56,12 +55,12 @@ public class Demineur extends JFrame implements Runnable {
     }
 
     /**
-     * Main du programme de démineur et affichage de 2 champs de mines
+     * Main of MineWeeper game and the interface.
      *
      * @param args not used
      */
     public static void main(String[] args) {
-        System.out.println("Bienvenue dans le demineur");
+        System.out.println("Welcome in the MineWeeper.");
         new Demineur();
     }
 
@@ -164,6 +163,7 @@ public class Demineur extends JFrame implements Runnable {
      * Function that will save the game score into a file.
      */
     public void saveScore() {
+        //TODO: Finish saving score in a file.
         Path path = Paths.get(FILENAME);
 
         if (!Files.exists(path)) {
@@ -172,7 +172,16 @@ public class Demineur extends JFrame implements Runnable {
         }
     }
 
+    /**
+     * Initializes connection with the server given the address of the server and create in and out dataStream.
+     * It will also send a first message containing the pseudo of the player. It will then launch a thread that*
+     * will listen for data from the server.
+     * @param ip String containing the ip of the server to connect to.
+     * @param port Integer that will the port number used to connect to the server.
+     * @param nickname String containing the pseudo/nickname of the player.
+     */
     public void connectServer(String ip, int port, String nickname) {
+        onlineGame = true; //Connection to server the game will be set to online.
         try {
             sock = new Socket(ip, port);
             out = new DataOutputStream(sock.getOutputStream());
@@ -188,19 +197,26 @@ public class Demineur extends JFrame implements Runnable {
             process.start();
         } catch (UnknownHostException e) {
             System.out.println("Impossible to connect to " + ip + ":" + port + " with nickname:" + nickname);
-            JOptionPane.showConfirmDialog(null, "Impossible to connect to " + ip + ":" + port + " with nickname:" + nickname, "Close confirmation",
+            JOptionPane.showConfirmDialog(null, "Impossible to connect to " + ip + ":" +
+                            port + " with nickname:" + nickname, "Close confirmation",
                     JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
         } catch (IOException e) {
             System.out.println("Impossible to connect to " + ip + ":" + port + " with nickname:" + nickname);
-            JOptionPane.showConfirmDialog(null, "Impossible to connect to " + ip + ":" + port + " with nickname:" + nickname, "Close confirmation",
+            JOptionPane.showConfirmDialog(null, "Impossible to connect to " + ip + ":" +
+                            port + " with nickname:" + nickname, "Close confirmation",
                     JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
         }
     }
 
+    /**
+     * Disconnect from the server, sends the server the information and reset the interface to be ready to reconnect
+     * or to play local game.
+     */
     public void disconnect() {
-        connected = false;
+        onlineGame = false; //Disconnecting from server so the type of game returns to default : local.
+        connected = false; //Indicates that we are no longer connected to a server.
         try {
             out.writeUTF(Commands.CLIENTDISCONNECT.name());
             in.close();
@@ -257,6 +273,7 @@ public class Demineur extends JFrame implements Runnable {
                 readAndPrintServerMessage();
                 break;
             case "POSITION":
+                caseClickedBy();
             case "STARTGAME":
                 gameStarted = true;
                 panel.setNewGameButtonState(false);
@@ -287,6 +304,28 @@ public class Demineur extends JFrame implements Runnable {
         }
     }
 
+    /**
+     * A player was the first to clicked on a case. The server will send the position of the case, what it contains
+     * and which player clicked on it. This will be handled here.
+     */
+    private void caseClickedBy() {
+        try{
+            int x = in.readInt();
+            int y = in.readInt();
+            int value = in.readInt();
+            int player = in.readInt();
+            panel.addMsgGui("Player "+ player+ " clicked at the position (X : "+x+", Y : "+y+") :"+value);
+            panel.getCaseXY(x,y).setClickedTrueAndValue(value);
+        }catch (IOException e){
+            panel.addMsgGui("Error while receiving case click information.");
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * After having receiving the command saying the server will send a message, this function will start waiting for
+     * the server's message. As soon as the message is received it will printed on the GUI.
+     */
     private void readAndPrintServerMessage() {
         try {
             String msg = in.readUTF();
@@ -294,6 +333,39 @@ public class Demineur extends JFrame implements Runnable {
         } catch (IOException e) {
             System.out.println("Error when receiving server data about 'message'.");
             panel.addMsgGui("Error when receiving server data about 'message'.");
+        }
+    }
+
+    /**
+     * Make possible to know the type of the game : online or local.
+     * @return The state of the game. True means that the game is with a server (online)
+     */
+    public boolean isOnlineGame() {
+        return onlineGame;
+    }
+
+    /**
+     * Set the type of game (online or local)
+     * @param onlineGame Boolean, true means the state will be put to online game and false to local.
+     */
+    public void setOnlineGame(boolean onlineGame) {
+        this.onlineGame = onlineGame;
+    }
+
+    /**
+     * Will send the command and the information of the position (x,y) of the case clicked
+     * @param x Integer of the horizontal axe value of the clicked case.
+     * @param y Integer of the vertical axe value of the clicked case.
+     */
+    public void sendClick(int x, int y) {
+        try{
+            out.writeUTF(Commands.POSITION.name()); //Send the command that describe the information that will follow
+            out.writeInt(x);
+            out.writeInt(y);
+        }catch (IOException e){
+            System.out.println("Error while sending click position information (X : "+x+", Y : "+y+").");
+            panel.addMsgGui("Error while sending click position information (X : "+x+", Y : "+y+").");
+            e.printStackTrace();
         }
     }
 }

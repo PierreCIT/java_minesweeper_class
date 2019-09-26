@@ -22,6 +22,7 @@ public class GUI extends JPanel implements ActionListener {
     private JMenuItem mEasy;
     private JMenuItem mMedium;
     private JMenuItem mHard;
+
     private Case[][] tabCase; //Array that will store the cases in the gridLayer
     private Compteur compteur;
 
@@ -31,7 +32,7 @@ public class GUI extends JPanel implements ActionListener {
     private TextField nicknameTF; //Player's nickname
     private JButton coDiscoButton; // Button that will be used to either connect or disconnect from server
     private JPanel connectPanel; //Panel that will contain connection components
-    private TextArea msgServer = new TextArea(5, 30); //Text area in which messages from the server will be printed
+    private TextArea msgServer = new TextArea(5, 35); //Text area in which messages from the server will be printed
 
     /**
      * Create the pannels information inside the frame
@@ -101,7 +102,7 @@ public class GUI extends JPanel implements ActionListener {
         //Menu bar
         JMenuBar menuBar = new JMenuBar();
         //Menu partie
-        JMenu menuPartie = new JMenu("Partie");
+        JMenu menuPartie = new JMenu("Game");
         menuBar.add(menuPartie);
 
         //Button new game
@@ -120,7 +121,7 @@ public class GUI extends JPanel implements ActionListener {
 
 
         //Button quit in the "game" menu
-        mQuitter = new JMenuItem("Quitter", KeyEvent.VK_Q);
+        mQuitter = new JMenuItem("Leave", KeyEvent.VK_Q);
         mQuitter.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, ActionEvent.CTRL_MASK));
         menuPartie.add(mQuitter);
         mQuitter.setToolTipText("The end");
@@ -147,6 +148,7 @@ public class GUI extends JPanel implements ActionListener {
         int rep = JOptionPane.showConfirmDialog(null, "Are you sure ?", "Close confirmation",
                 JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
         if (rep == JOptionPane.YES_OPTION) {
+            System.out.println("Closing... See you soon !");
             System.exit(0);
         }
     }
@@ -164,23 +166,26 @@ public class GUI extends JPanel implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == butQuit) {
-            System.out.println("Closing... See you soon !");
+            if(main.isOnlineGame())
+                main.disconnect();
             quit();
         } else if (e.getSource() == butRestart) {
-            main.getChamp().newParty(main.level);
+            main.getChamp().newGame(main.level);
             newGame();
         } else if (e.getSource() == mQuitter) {
+            if(main.isOnlineGame())
+                main.disconnect();
             quit();
         } else if (e.getSource() == mAbout) {
             about();
         } else if (e.getSource() == mEasy) {
-            main.getChamp().newParty(Level.EASY);
+            main.getChamp().newGame(Level.EASY);
             newGame(Level.EASY);
         } else if (e.getSource() == mMedium) {
-            main.getChamp().newParty(Level.MEDIUM);
+            main.getChamp().newGame(Level.MEDIUM);
             newGame(Level.MEDIUM);
         } else if (e.getSource() == mHard) {
-            main.getChamp().newParty(Level.HARD);
+            main.getChamp().newGame(Level.HARD);
             newGame(Level.HARD);
         } else if (e.getSource() == coDiscoButton)
             if (!main.connected)
@@ -221,7 +226,7 @@ public class GUI extends JPanel implements ActionListener {
      */
     public void newGame(Level level) {
         gridPannel.removeAll();
-        main.getChamp().newParty(level);
+        main.getChamp().newGame(level);
         placeCases();
         main.pack();
         compteur.stopCpt();
@@ -278,4 +283,8 @@ public class GUI extends JPanel implements ActionListener {
         butRestart.repaint();
     }
 
+
+    public Case getCaseXY(int X, int Y) {
+        return tabCase[X][Y];
+    }
 }

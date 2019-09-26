@@ -4,10 +4,9 @@ import java.util.Random;
 
 
 /**
- * @author Pierre
- * Class which will create the field of the deminor
+ * @author Pierre SEITE
+ * Class which will create the field of the MinesWeeper
  */
-
 public class Champ {
     private static final int DIMEASY = 5;
     private static final int DIMMEDIUM = 20;
@@ -82,6 +81,10 @@ public class Champ {
         }
     }
 
+    /**
+     * Determines the number of mines to put in the field regarding the level of difficulty
+     * @return Integer representing the number of mine to put
+     */
     private int nbMinesForLevel(){
         if(level==Level.EASY){
             nbMines=NBMINESEASY;
@@ -95,11 +98,15 @@ public class Champ {
         }
     }
 
+    /**
+     * Get the number of mines
+     * @return Integer of the number of mines
+     */
     public int getNbMines(){
         return nbMines;
     }
 
-    public void newParty(Level level){
+    public void newGame(Level level){
         if(level==this.level){
             placesMines(nbMinesForLevel());
             this.print();
@@ -112,9 +119,10 @@ public class Champ {
         }
     }
     /**
-     * @param x
-     * @param y
-     * @return Number of mines surrounfing the position given by x and y
+     * Return the number of mines surrounding a position (excluding the position itself)
+     * @param x Integer of the X position of the case
+     * @param y Integer of the Y position of the case
+     * @return Number of mines surrounding the position given by x and y
      */
     public int numberMinesSurrounding(int x, int y) {
         int nbMines = 0;
@@ -185,14 +193,27 @@ public class Champ {
 
     }
 
+    /**
+     * Return a boolean answering the question is there a mine.
+     * @param x Integer x position of the mine
+     * @param y Integer y position of the mine
+     * @return Boolean true if there is a mine false otherwise.
+     */
     public boolean isMine(int x, int y) {
         return mines[x][y];
     }
 
+    /**
+     * Get the X dimension of the mine field
+     * @return Integer
+     */
     public int getDimX(){
         return DimX;
     }
-
+    /**
+     * Get the Y dimension of the mine field
+     * @return Integer
+     */
     public int getDimY(){
         return DimY;
     }
