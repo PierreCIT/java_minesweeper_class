@@ -149,7 +149,7 @@ public class Demineur extends JFrame implements Runnable {
     }
 
     /**
-     * Rest the game and set the level to the leveled passed in parameters
+     * Reset the game and set the level to the leveled passed in parameters
      *
      * @param level Level of the new game.
      */
@@ -202,17 +202,27 @@ public class Demineur extends JFrame implements Runnable {
     public void disconnect() {
         connected = false;
         try {
+            out.writeUTF(Commands.CLIENTDISCONNECT.name());
             in.close();
             out.close();
             sock.close();
             System.out.println("Disconnected from server.\n");
             panel.coDecoButtonChangeText();
+            panel.setNewGameButtonState(true);
             process = null; //We kill the process that was waiting for messages from the server
+            panel.addMsgGui("You disconnected from server.");
         } catch (IOException e) {
+            panel.addMsgGui("Error while disconnecting from server.");
+            System.out.println("Error while disconnecting from server.");
             e.printStackTrace();
         }
     }
 
+    /**
+     * Thread that will have for task to listen to input from server
+     * The input will always start by a command. So the information read will be send to processCommands.
+     * It also handles intentional and  unintentional disconnection with the server.
+     */
     @Override
     public void run() {
         //boucle infini
@@ -226,9 +236,13 @@ public class Demineur extends JFrame implements Runnable {
                 commmand = in.readUTF();
                 processCommands(commmand);
             } catch (IOException e) {
-                e.printStackTrace();
+                if (connected) { //If the state says that we are supposed to be connected then it's a real error
+                    e.printStackTrace();
+                } else { //Otherwise it's just that we closes connection.
+                    System.out.println("Connection with server closed (message from error management of waiting " +
+                            "servers's input");
+                }
             }
-
         }
     }
 
@@ -249,12 +263,14 @@ public class Demineur extends JFrame implements Runnable {
                 break;
             case "ENDGAME":
                 gameStarted = false;
+                panel.setNewGameButtonState(true);
+                panel.addMsgGui("Game ended by the server.");
                 break;
             case "SERVERSTOPPED":
                 gameStarted = false;
                 panel.addMsgGui("The server has closed.");
                 panel.setNewGameButtonState(true);
-                process=null; //Close listening thread
+                process = null; //Close listening thread
                 try {
                     in.close();
                     out.close();

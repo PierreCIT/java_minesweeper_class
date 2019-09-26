@@ -16,6 +16,7 @@ public class ServeurDemineur extends JFrame implements Runnable {
     private int playerIds = 0; //To id players by a number
     List<DataInputStream> inList = new ArrayList<DataInputStream>();
     List<DataOutputStream> outList = new ArrayList<DataOutputStream>();
+    List<Boolean> playerSateList = new ArrayList<Boolean>(); //Will contain the state of the player connection
 
     //Game Variables
     private boolean gameStarted = false;
@@ -63,6 +64,7 @@ public class ServeurDemineur extends JFrame implements Runnable {
         try {
             System.out.println("Thread " + playerIds + " Started");
             playerId = playerIds;
+            playerSateList.add(true);
             playerIds++;
             Socket socket = manageSock.accept(); //New client connected
             new Thread(this).start(); //Wait for new client
@@ -75,15 +77,16 @@ public class ServeurDemineur extends JFrame implements Runnable {
             out.writeUTF("MSG");//Send the command message to the client
             out.writeUTF("Connected as player " + playerId + "."); //Sent info connection confirmation to the client
 
-            while (true) {
+            while (playerSateList.get(playerId)) { //While the player sate is alive keep waiting for data
                 command = in.readUTF();
                 manageCommands(command, playerId);
             }
-
         } catch (IOException e) {
-            guiServer.addDialogText("Error while receiving information from player " + playerId + ". " +
-                    "Thread killed.");
-            e.printStackTrace();
+            if(playerSateList.get(playerId)) { //If the error is not cause due to an intentional disconnection
+                guiServer.addDialogText("Error while receiving information from player " + playerId + ". " +
+                        "Thread killed.");
+                e.printStackTrace();
+            }
         }
     }
 
@@ -100,6 +103,9 @@ public class ServeurDemineur extends JFrame implements Runnable {
             case "POSITION":
                 caseClicked(playerId); //Will wait for position information
                 break;
+            case "CLIENTDISCONNECT":
+                playerSateList.set(playerId, false); //Set the player state to dead.
+                guiServer.addDialogText("Player " + playerId + " has disconnected.");
             default:
                 break;
         }
@@ -117,13 +123,18 @@ public class ServeurDemineur extends JFrame implements Runnable {
 
     /**
      * Send a broadcast message to all connected client
+     *
      * @param msg The message (String) to send
      */
-    public void broadcastMSG(String msg){
-        try{
-            for(DataOutputStream out: outList) { //For all output stream saved (broadcast)
-                out.writeUTF("MSG"); //Send the command
-                out.writeUTF(msg); //send the message
+    public void broadcastMSG(String msg) {
+        try {
+            int i = 0;
+            for (DataOutputStream out : outList) { //For all output stream saved (broadcast)
+                if (playerSateList.get(i)) { //If the player state is still alive
+                    out.writeUTF("MSG"); //Send the command
+                    out.writeUTF(msg); //send the message
+                }
+                i++;
             }
         } catch (IOException e) {
             guiServer.addDialogText("Error while sending broadcast message.");
@@ -134,10 +145,14 @@ public class ServeurDemineur extends JFrame implements Runnable {
     /**
      * Send a broadcast message to all connected client to say that the game started
      */
-    public void gameStarted(){
-        try{
-            for(DataOutputStream out: outList) { //For all output stream saved (broadcast)
-                out.writeUTF("STARTGAME"); //Send the command
+    public void gameStarted() {
+        try {
+            int i = 0;
+            for (DataOutputStream out : outList) { //For all output stream saved (broadcast)
+                if (playerSateList.get(i)) { //If the player state is still alive
+                    out.writeUTF("STARTGAME"); //Send the command
+                }
+                i++;
             }
         } catch (IOException e) {
             guiServer.addDialogText("Error while sending broadcast :'STARTGAME'.");
@@ -148,11 +163,17 @@ public class ServeurDemineur extends JFrame implements Runnable {
     /**
      * Send a broadcast message to all connected client to say that the game ended
      */
-    public void gameStopped(){
-        try{
-            for(DataOutputStream out: outList) { //For all output stream saved (broadcast)
-                out.writeUTF(Commands.ENDGAME.name()); //Send the command
+    public void gameStopped() {
+        try {
+            gameStarted = false;
+            int i = 0;
+            for (DataOutputStream out : outList) { //For all output stream saved (broadcast)
+                if (playerSateList.get(i)) { //If the player state is still alive
+                    out.writeUTF(Commands.ENDGAME.name()); //Send the command
+                }
+                i++;
             }
+            guiServer.addDialogText("Game ended by server.");
         } catch (IOException e) {
             guiServer.addDialogText("Error while sending broadcast :'ENDGAME'.");
             e.printStackTrace();
@@ -161,6 +182,7 @@ public class ServeurDemineur extends JFrame implements Runnable {
 
     /**
      * Determines if the game is started or not
+     *
      * @return The state of the game
      */
     public boolean isGameStarted() {
@@ -170,9 +192,9 @@ public class ServeurDemineur extends JFrame implements Runnable {
     /**
      * Sends a close server message to all clients and then close the server
      */
-    public void closeServer(){
-        try{
-            for(DataOutputStream out: outList) { //For all output stream saved (broadcast)
+    public void closeServer() {
+        try {
+            for (DataOutputStream out : outList) { //For all output stream saved (broadcast)
                 out.writeUTF(Commands.SERVERSTOPPED.name()); //Send the command
             }
         } catch (IOException e) {
