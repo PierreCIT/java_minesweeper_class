@@ -31,6 +31,8 @@ public class Demineur extends JFrame implements Runnable {
     private DataInputStream in;
     private Thread process; //Thread that will listen for server messages
     private String commmand; // String that will receive commands from the server
+    //Online game
+    private boolean gameStarted = false; //Boolean that describes the state of the online game
 
     /**
      * Constructor of the Demineur which will initialize the game
@@ -205,7 +207,7 @@ public class Demineur extends JFrame implements Runnable {
             sock.close();
             System.out.println("Disconnected from server.\n");
             panel.coDecoButtonChangeText();
-            process=null; //We kill the process that was waiting for messages from the server
+            process = null; //We kill the process that was waiting for messages from the server
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -241,9 +243,31 @@ public class Demineur extends JFrame implements Runnable {
                 readAndPrintServerMessage();
                 break;
             case "POSITION":
+            case "STARTGAME":
+                gameStarted = true;
+                panel.setNewGameButtonState(false);
+                break;
+            case "ENDGAME":
+                gameStarted = false;
+                break;
+            case "SERVERSTOPPED":
+                gameStarted = false;
+                panel.addMsgGui("The server has closed.");
+                panel.setNewGameButtonState(true);
+                process=null; //Close listening thread
+                try {
+                    in.close();
+                    out.close();
+                    sock.close();
+                } catch (IOException e) {
+                    panel.addMsgGui("Error while closing communications with server.");
+                    System.out.println("Error while closing communications with server.");
+                    e.printStackTrace();
+                }
+                break;
             default:
-                System.out.println("Erreur: command from server not understood.\n");
-                panel.addMsgGui("Erreur: command from server not understood.");
+                System.out.println("Error: command from server not understood: " + cmd + "\n");
+                panel.addMsgGui("Error: command from server not understood : " + cmd);
         }
     }
 
@@ -255,8 +279,6 @@ public class Demineur extends JFrame implements Runnable {
             System.out.println("Error when receiving server data about 'message'.");
             panel.addMsgGui("Error when receiving server data about 'message'.");
         }
-
-
     }
 }
 

@@ -140,7 +140,7 @@ class Case extends JPanel implements MouseListener {
                 int rep = JOptionPane.showConfirmDialog(null, "BOOM ! GAME OVER ! Try again ! ", "Game Over",
                         JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE);
                 if (rep == JOptionPane.YES_OPTION) {
-                    demin.getGui().newParty(demin.level);
+                    demin.getGui().newGame(demin.level);
                 }
             } else {
                 //If the case clicked is empty without close bombs then we call the function to show all adjacentValues
@@ -155,7 +155,7 @@ class Case extends JPanel implements MouseListener {
                                 "\nWould you like to restart ?", "Congratulations",
                         JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
                 if (rep == JOptionPane.YES_OPTION) {
-                    demin.getGui().newParty(demin.level);
+                    demin.getGui().newGame(demin.level);
                 }
                 demin.saveScore();
             }

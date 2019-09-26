@@ -1,5 +1,5 @@
 package emse.ismin.demineur;
 
 public enum Commands {
-    MSG, POSITION, ENDGAME, STARTGAME, RESETGAME
+    MSG, POSITION, ENDGAME, STARTGAME, RESETGAME, SERVERSTOPPED
 }

@@ -5,7 +5,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.net.ConnectException;
 
 
 public class GUI extends JPanel implements ActionListener {
@@ -169,20 +168,20 @@ public class GUI extends JPanel implements ActionListener {
             quit();
         } else if (e.getSource() == butRestart) {
             main.getChamp().newParty(main.level);
-            newParty();
+            newGame();
         } else if (e.getSource() == mQuitter) {
             quit();
         } else if (e.getSource() == mAbout) {
             about();
         } else if (e.getSource() == mEasy) {
             main.getChamp().newParty(Level.EASY);
-            newParty(Level.EASY);
+            newGame(Level.EASY);
         } else if (e.getSource() == mMedium) {
             main.getChamp().newParty(Level.MEDIUM);
-            newParty(Level.MEDIUM);
+            newGame(Level.MEDIUM);
         } else if (e.getSource() == mHard) {
             main.getChamp().newParty(Level.HARD);
-            newParty(Level.HARD);
+            newGame(Level.HARD);
         } else if (e.getSource() == coDiscoButton)
             if (!main.connected)
                 main.connectServer(ipTF.getText(), Integer.parseInt(portTF.getText()), nicknameTF.getText());
@@ -206,7 +205,7 @@ public class GUI extends JPanel implements ActionListener {
     /**
      * Asked to all cases to start to reinitialize. (The mine position is not changed here)
      */
-    private void newParty() {
+    private void newGame() {
         for (int x = 0; x < main.getChamp().getDimX(); x++) {
             for (int y = 0; y < main.getChamp().getDimY(); y++) {
                 tabCase[x][y].newParty();
@@ -220,7 +219,7 @@ public class GUI extends JPanel implements ActionListener {
      * Asked to all cases to start a new party, and reposition the mines.
      * Take as input level when the new game is to be launch with a new level.
      */
-    public void newParty(Level level) {
+    public void newGame(Level level) {
         gridPannel.removeAll();
         main.getChamp().newParty(level);
         placeCases();
@@ -268,6 +267,15 @@ public class GUI extends JPanel implements ActionListener {
 
     public void addMsgGui(String msg) {
         msgServer.append(msg + "\n");
+    }
+
+    /**
+     * Enable or disable the "new Game" button on the GUI
+     * @param state A boolean
+     */
+    public void setNewGameButtonState(boolean state){
+        butRestart.setEnabled(state);
+        butRestart.repaint();
     }
 
 }
