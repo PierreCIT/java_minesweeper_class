@@ -73,10 +73,15 @@ public class ServeurDemineur extends JFrame implements Runnable {
         try {
             System.out.println("Thread " + playerIds + " Started");
             playerId = playerIds;
-            playerScoreList.add(0);
-            playerSateList.add(true);
             playerIds++;
             Socket socket = manageSock.accept(); //New client connected
+            if (gameStarted) {
+                playerScoreList.add(-1);
+            }//If a player join while the game is started he is set to lost
+            else {
+                playerScoreList.add(0);
+            }
+            playerSateList.add(true);
             new Thread(this).start(); //Wait for new client
             DataInputStream in = new DataInputStream(socket.getInputStream());
             DataOutputStream out = new DataOutputStream(socket.getOutputStream());
@@ -130,14 +135,18 @@ public class ServeurDemineur extends JFrame implements Runnable {
                     guiServer.addDialogText("Player " + playerId + " clicked on (X : " + X + ", Y : " + Y + ").");
                     caseClicked[X][Y] = true; //Set the case as clicked.
                     broadcastClick(playerId, X, Y);
-                    if (!mineField.isMine(X, Y)) { //If the player didn't clicked on a mine is score is increase
-                        playerScoreList.set(playerId, playerScoreList.get(playerId) + 1); // The score of this player is increased
-                        if (isWin()) {
-                            playerFinishedGame(playerId);
+                    if (!lastPlayerAlive()) {
+                        if (!mineField.isMine(X, Y)) { //If the player didn't clicked on a mine is score is increase
+                            playerScoreList.set(playerId, playerScoreList.get(playerId) + 1); // The score of this player is increased
+                            if (isWin()) {
+                                playerFinishedGame(playerId);
+                            }
+                        } else {
+                            playerScoreList.set(playerId, -1); //Score of -1 means he lost
+                            youLostClient(playerId);
                         }
                     } else {
-                        playerScoreList.set(playerId, -1); //Score of -1 means he lost
-                        youLostClient(playerId);
+                        playerFinishedGame(playerId);
                     }
                     //TODO: What to do if everyone has lost
                 } else {
@@ -151,6 +160,21 @@ public class ServeurDemineur extends JFrame implements Runnable {
         } else {
             guiServer.addDialogText("Error: player" + playerId + " lost but is still sending click data.");
         }
+    }
+
+    /**
+     * Give the information that if the person that click is the last one alive then he is the winner.
+     *
+     * @return A boolean true if only one player is connected and didn't already lost/exploded/score = -1
+     */
+    private boolean lastPlayerAlive() {
+        int playerConnectedAndAlive = 0;
+        for (int i = 0; i < playerSateList.size(); i++) {
+            if (playerSateList.get(i) && playerScoreList.get(i) != -1) {
+                playerConnectedAndAlive++;
+            }
+        }
+        return playerConnectedAndAlive == 1;
     }
 
     /**
@@ -398,7 +422,7 @@ public class ServeurDemineur extends JFrame implements Runnable {
      * Place new mines according to the level and send the information to the client.
      */
     synchronized public void newGame() {
-        try{
+        try {
             mineField.newGame(level);
             caseClicked = new boolean[mineField.getDimX()][mineField.getDimY()]; //Set a new case clicked
             int i = 0;
@@ -407,11 +431,12 @@ public class ServeurDemineur extends JFrame implements Runnable {
                     out.writeUTF("LEVEL"); //Send the command
                     out.writeUTF(level.name()); //Send the command
                     out.writeUTF(Commands.NEWGAME.name()); //Send the command
+                    playerScoreList.set(i, 0); //Reset values scores.
                 }
                 i++;
             }
-        }catch (IOException e){
-            guiServer.addDialogText("Error while sending new game information : "+level);
+        } catch (IOException e) {
+            guiServer.addDialogText("Error while sending new game information : " + level);
             e.printStackTrace();
         }
     }

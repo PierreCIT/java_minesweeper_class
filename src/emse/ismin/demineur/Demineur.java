@@ -288,6 +288,7 @@ public class Demineur extends JFrame implements Runnable {
                 panel.getCompteur().stopCpt();
                 panel.addMsgGui("The server has closed.");
                 panel.setNewGameButtonState(true);
+                panel.coDecoButtonChangeText();
                 process = null; //Close listening thread
                 try {
                     in.close();
@@ -330,7 +331,6 @@ public class Demineur extends JFrame implements Runnable {
     synchronized private void newLevel() {
         try {
             String levelTemp = in.readUTF();
-            System.out.println(levelTemp);
             level = Level.valueOf(levelTemp);
         } catch (IOException e) {
             panel.addMsgGui("Error while receiving new level info.");

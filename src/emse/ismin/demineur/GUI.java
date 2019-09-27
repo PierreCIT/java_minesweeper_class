@@ -196,6 +196,7 @@ public class GUI extends JPanel implements ActionListener {
                 main.connectServer(ipTF.getText(), Integer.parseInt(portTF.getText()), nicknameTF.getText());
             } else {
                 main.disconnect();
+                compteur.stopCpt();
             }
     }
 
