@@ -13,6 +13,7 @@ public class GUI extends JPanel implements ActionListener {
     private JButton butRestart;
     private JLabel labWelcom;
     private JLabel labScoreLevel;
+    private JPanel northPanelLabels;
     private JPanel northPanel;
     private JPanel gridPannel = new JPanel();
 
@@ -46,14 +47,16 @@ public class GUI extends JPanel implements ActionListener {
 
         setLayout(new BorderLayout());
         northPanel = new JPanel();
+        northPanelLabels = new JPanel();
 
         //NorthPanel's label
         labWelcom = new JLabel("Welcome on the connected Minesweeper !");
         labScoreLevel = new JLabel("Score : " + main.score + " , Level : " + main.level, SwingConstants.CENTER);
         northPanel.setLayout(new BorderLayout());
-        northPanel.add(labWelcom, BorderLayout.NORTH);
-        northPanel.add(compteur, BorderLayout.NORTH); //Adding compteur to northPanel
-        northPanel.add(labScoreLevel, BorderLayout.NORTH);
+        northPanelLabels.add(labWelcom);
+        northPanelLabels.add(compteur); //Adding compteur to northPanel
+        northPanelLabels.add(labScoreLevel);
+        northPanel.add(northPanelLabels, BorderLayout.NORTH);
         labWelcom.setFont(new Font("Papyrus", Font.ITALIC, 12));
         labScoreLevel.setFont(new Font("Papyrus", Font.ITALIC, 12));
 
@@ -94,6 +97,7 @@ public class GUI extends JPanel implements ActionListener {
         //Button at the bottom of the grid
         //Game state fetaures
         ButtonSouth = new JPanel();
+        msgServer.setEditable(false);
         ButtonSouth.add(msgServer);
         ButtonSouth.add(butRestart);
         ButtonSouth.add(butQuit);
@@ -166,14 +170,14 @@ public class GUI extends JPanel implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == butQuit) {
-            if(main.isOnlineGame())
+            if (main.isOnlineGame())
                 main.disconnect();
             quit();
         } else if (e.getSource() == butRestart) {
             main.getChamp().newGame(main.level);
             newGame();
         } else if (e.getSource() == mQuitter) {
-            if(main.isOnlineGame())
+            if (main.isOnlineGame())
                 main.disconnect();
             quit();
         } else if (e.getSource() == mAbout) {
@@ -188,10 +192,11 @@ public class GUI extends JPanel implements ActionListener {
             main.getChamp().newGame(Level.HARD);
             newGame(Level.HARD);
         } else if (e.getSource() == coDiscoButton)
-            if (!main.connected)
+            if (!main.connected) {
                 main.connectServer(ipTF.getText(), Integer.parseInt(portTF.getText()), nicknameTF.getText());
-            else
+            } else {
                 main.disconnect();
+            }
     }
 
     private void placeCases() {
@@ -276,15 +281,29 @@ public class GUI extends JPanel implements ActionListener {
 
     /**
      * Enable or disable the "new Game" button on the GUI
+     *
      * @param state A boolean
      */
-    public void setNewGameButtonState(boolean state){
+    public void setNewGameButtonState(boolean state) {
         butRestart.setEnabled(state);
         butRestart.repaint();
     }
 
-
+    /**
+     * get case X,Y from GUI
+     * @param X X axis position of the case to get from gridlayout
+     * @param Y Y axis position of the case to get from gridlayout
+     * @return The case from the grid layout at the position X, Y
+     */
     public Case getCaseXY(int X, int Y) {
         return tabCase[X][Y];
+    }
+
+    /**
+     * Get the restart button from GUI
+     * @return The Restart button from GUI
+     */
+    public JButton getButRestart() {
+        return butRestart;
     }
 }

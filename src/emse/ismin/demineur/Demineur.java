@@ -182,7 +182,6 @@ public class Demineur extends JFrame implements Runnable {
      * @param nickname String containing the pseudo/nickname of the player.
      */
     public void connectServer(String ip, int port, String nickname) {
-        onlineGame = true; //Connection to server the game will be set to online.
         try {
             sock = new Socket(ip, port);
             out = new DataOutputStream(sock.getOutputStream());
@@ -196,6 +195,8 @@ public class Demineur extends JFrame implements Runnable {
             panel.coDecoButtonChangeText();
             process = new Thread(this);
             process.start();
+            onlineGame = true; //Connected to server the game will be set to online.
+            panel.getButRestart().setEnabled(false);
         } catch (UnknownHostException e) {
             System.out.println("Impossible to connect to " + ip + ":" + port + " with nickname:" + nickname);
             JOptionPane.showConfirmDialog(null, "Impossible to connect to " + ip + ":" +
@@ -207,7 +208,6 @@ public class Demineur extends JFrame implements Runnable {
             JOptionPane.showConfirmDialog(null, "Impossible to connect to " + ip + ":" +
                             port + " with nickname:" + nickname, "Close confirmation",
                     JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
         }
     }
 
@@ -215,8 +215,9 @@ public class Demineur extends JFrame implements Runnable {
      * Disconnect from the server, sends the server the information and reset the interface to be ready to reconnect
      * or to play local game.
      */
-    public void disconnect() {
+    synchronized public void disconnect() {
         onlineGame = false; //Disconnecting from server so the type of game returns to default : local.
+        process = null; //We kill the process that was waiting for messages from the server
         if (connected) { //We don't need to disconnect if we are not connected
             connected = false; //Indicates that we are no longer connected to a server.
             try {
@@ -227,7 +228,6 @@ public class Demineur extends JFrame implements Runnable {
                 System.out.println("Disconnected from server.\n");
                 panel.coDecoButtonChangeText();
                 panel.setNewGameButtonState(true);
-                process = null; //We kill the process that was waiting for messages from the server
                 panel.addMsgGui("You disconnected from server.");
             } catch (IOException e) {
                 panel.addMsgGui("Error while disconnecting from server.");
@@ -244,12 +244,6 @@ public class Demineur extends JFrame implements Runnable {
      */
     @Override
     public void run() {
-        //boucle infini
-
-        //lecture dans in
-        //lecture de la commande
-        //en fct de la datareceived on affiche/mines ...
-        //lecture du joueur qui a cliqué en XY
         while (process != null) {
             try {
                 commmand = in.readUTF();
@@ -270,7 +264,7 @@ public class Demineur extends JFrame implements Runnable {
      *
      * @param cmd A string which must corresponds to one of the possibilities of the command ENUM
      */
-    private void processCommands(String cmd) {
+    synchronized private void processCommands(String cmd) {
         switch (cmd) {
             case "MSG":
                 readAndPrintServerMessage();
@@ -279,16 +273,19 @@ public class Demineur extends JFrame implements Runnable {
                 caseClickedBy();
             case "STARTGAME":
                 gameStarted = true;
+                panel.getCompteur().startCpt();
                 panel.setNewGameButtonState(false);
                 break;
             case "ENDGAME":
                 gameStarted = false;
+                panel.getCompteur().stopCpt();
                 panel.setNewGameButtonState(true);
                 panel.addMsgGui("Game ended by the server.");
                 break;
             case "SERVERSTOPPED":
                 gameStarted = false;
                 connected = false;
+                panel.getCompteur().stopCpt();
                 panel.addMsgGui("The server has closed.");
                 panel.setNewGameButtonState(true);
                 process = null; //Close listening thread
@@ -304,9 +301,11 @@ public class Demineur extends JFrame implements Runnable {
                 break;
             case "LOST":
                 gameStarted =false;
+                panel.getCompteur().stopCpt();
                 lostExploded();
                 break;
             case "FINISHGAME":
+                panel.getCompteur().stopCpt();
                 gameStarted=false;
                 finishGamePopUp();
                 break;
