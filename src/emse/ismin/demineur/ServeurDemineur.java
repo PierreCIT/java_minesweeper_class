@@ -393,4 +393,26 @@ public class ServeurDemineur extends JFrame implements Runnable {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Place new mines according to the level and send the information to the client.
+     */
+    synchronized public void newGame() {
+        try{
+            mineField.newGame(level);
+            caseClicked = new boolean[mineField.getDimX()][mineField.getDimY()]; //Set a new case clicked
+            int i = 0;
+            for (DataOutputStream out : outList) { //For all output stream saved (broadcast)
+                if (playerSateList.get(i)) { //If the player state is still alive
+                    out.writeUTF("LEVEL"); //Send the command
+                    out.writeUTF(level.name()); //Send the command
+                    out.writeUTF(Commands.NEWGAME.name()); //Send the command
+                }
+                i++;
+            }
+        }catch (IOException e){
+            guiServer.addDialogText("Error while sending new game information : "+level);
+            e.printStackTrace();
+        }
+    }
 }

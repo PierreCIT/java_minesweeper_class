@@ -10,11 +10,11 @@ public class GUIServer extends JPanel implements ActionListener {
     private JButton startB; // Button to use to start the server
     private JButton closeServerB; // Button to use to close the server and all connections
     private JPanel southButtonsP;
-    private JTextArea dialog = new JTextArea(20,35); // Dialog/log's server information
+    private JTextArea dialog = new JTextArea(20, 35); // Dialog/log's server information
     private String[] levels = {Level.EASY.name(), Level.MEDIUM.name(), Level.HARD.name(), Level.CUSTOM.name()};
     private JComboBox listLevels;
 
-    public GUIServer(ServeurDemineur server){
+    public GUIServer(ServeurDemineur server) {
         main = server;
         setLayout(new BorderLayout());
 
@@ -39,61 +39,73 @@ public class GUIServer extends JPanel implements ActionListener {
         this.add(dialog, BorderLayout.CENTER);
     }
 
-    public void addDialogText(String newMsg){
-        dialog.append(newMsg+"\n");
+    public void addDialogText(String newMsg) {
+        dialog.append(newMsg + "\n");
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(e.getSource() == startB){
-            if(!main.isGameStarted()) {
+        if (e.getSource() == startB) {
+            if (!main.isGameStarted()) {
                 main.setGameStarted(true);
                 main.startGame();
-                main.broadcastMSG("Game started");
                 main.gameStarted();
                 startB.setText("End Game");
-            }else{
+                main.broadcastMSG("Game started");
+                main.newGame();
+                listLevels.setEnabled(false);
+            } else {
                 startB.setText("Start");
+                listLevels.setEnabled(true);
                 main.gameStopped();
             }
-        }else if(e.getSource() ==  closeServerB){
+        } else if (e.getSource() == closeServerB) {
             main.gameStopped();
             main.closeServer();
-        }else if(e.getSource() == listLevels){
-            JComboBox c = (JComboBox)e.getSource();
-            handleLevelSelection((String)c.getSelectedItem());
+        } else if (e.getSource() == listLevels) {
+            JComboBox c = (JComboBox) e.getSource();
+            handleLevelSelection((String) c.getSelectedItem());
         }
     }
 
     private void handleLevelSelection(String selectedItem) {
-        switch (selectedItem){
-            case "EASY":
-                if(main.getLevel() != Level.EASY) {
-                    addDialogText("Level changed to EASY");
-                    main.setLevel(Level.EASY);
-                }
-                break;
-            case "MEDIUM":
-                if(main.getLevel() != Level.MEDIUM) {
-                    addDialogText("Level changed to MEDIUM");
-                    main.setLevel(Level.MEDIUM);
-                }
-                break;
-            case "HARD":
-                if(main.getLevel() != Level.HARD) {
-                    addDialogText("Level changed to HARD");
-                    main.setLevel(Level.HARD);
-                }
-                break;
-            case "CUSTOM":
-                if(main.getLevel() != Level.CUSTOM) {
-                    addDialogText("Level changed to CUSTOM");
-                    main.setLevel(Level.CUSTOM);
-                }
-                break;
-            default:
-                addDialogText("Error, unknown level selected.");
-                break;
+        if (!main.isGameStarted()) { //Cannot change game level if game is started
+            switch (selectedItem) {
+                case "EASY":
+                    if (main.getLevel() != Level.EASY) {
+                        addDialogText("Level changed to EASY");
+                        main.setLevel(Level.EASY);
+                        main.newGame();
+                    }
+                    break;
+                case "MEDIUM":
+                    if (main.getLevel() != Level.MEDIUM) {
+                        addDialogText("Level changed to MEDIUM");
+                        main.setLevel(Level.MEDIUM);
+                        main.newGame();
+                    }
+                    break;
+                case "HARD":
+                    if (main.getLevel() != Level.HARD) {
+                        addDialogText("Level changed to HARD");
+                        main.setLevel(Level.HARD);
+                        main.newGame();
+                    }
+                    break;
+                case "CUSTOM":
+                    if (main.getLevel() != Level.CUSTOM) {
+                        addDialogText("Level changed to CUSTOM");
+                        main.setLevel(Level.CUSTOM);
+                        main.newGame();
+                    }
+                    break;
+                default:
+                    addDialogText("Error, unknown level selected.");
+                    break;
+
+            }
+        } else {
+            addDialogText("Cannot change 'level' : a game is already started.");
         }
     }
 }

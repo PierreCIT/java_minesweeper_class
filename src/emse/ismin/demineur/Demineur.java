@@ -176,8 +176,9 @@ public class Demineur extends JFrame implements Runnable {
      * Initializes connection with the server given the address of the server and create in and out dataStream.
      * It will also send a first message containing the pseudo of the player. It will then launch a thread that*
      * will listen for data from the server.
-     * @param ip String containing the ip of the server to connect to.
-     * @param port Integer that will the port number used to connect to the server.
+     *
+     * @param ip       String containing the ip of the server to connect to.
+     * @param port     Integer that will the port number used to connect to the server.
      * @param nickname String containing the pseudo/nickname of the player.
      */
     public void connectServer(String ip, int port, String nickname) {
@@ -216,7 +217,7 @@ public class Demineur extends JFrame implements Runnable {
      */
     public void disconnect() {
         onlineGame = false; //Disconnecting from server so the type of game returns to default : local.
-        if(connected) { //We don't need to disconnect if we are not connected
+        if (connected) { //We don't need to disconnect if we are not connected
             connected = false; //Indicates that we are no longer connected to a server.
             try {
                 out.writeUTF(Commands.CLIENTDISCONNECT.name());
@@ -302,12 +303,21 @@ public class Demineur extends JFrame implements Runnable {
                 }
                 break;
             case "LOST":
+                gameStarted =false;
                 lostExploded();
                 break;
             case "FINISHGAME":
+                gameStarted=false;
                 finishGamePopUp();
                 break;
+            case "LEVEL":
+                newLevel();
+                break;
+            case "NEWGAME":
+                panel.newGame(level);
+                break;
             case "WIN":
+                gameStarted =false;
                 won();
                 break;
             default:
@@ -315,14 +325,28 @@ public class Demineur extends JFrame implements Runnable {
                 panel.addMsgGui("Error: command from server not understood : " + cmd);
         }
     }
+    /**
+     * Recive new level information from server
+     */
+    synchronized private void newLevel() {
+        try {
+            String levelTemp = in.readUTF();
+            System.out.println(levelTemp);
+            level = Level.valueOf(levelTemp);
+        } catch (IOException e) {
+            panel.addMsgGui("Error while receiving new level info.");
+            e.printStackTrace();
+        }
+
+    }
 
     /**
      * Popup to inform player the game is finished.
      */
     private void finishGamePopUp() {
-        lost=true;
+        lost = true;
         JOptionPane.showConfirmDialog(null, "The game is finished. Check scores to see your " +
-                        "rank", "End of the game", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE);
+                "rank", "End of the game", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE);
     }
 
     /**
@@ -337,7 +361,7 @@ public class Demineur extends JFrame implements Runnable {
      * Action to perform when player exploded by clicking on a mine
      */
     private void lostExploded() {
-        lost=true;
+        lost = true;
         panel.addMsgGui("You lost !");
         JOptionPane.showConfirmDialog(null, "BOOM ! GAME OVER !", "Game Over",
                 JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
@@ -348,14 +372,14 @@ public class Demineur extends JFrame implements Runnable {
      * and which player clicked on it. This will be handled here.
      */
     private void caseClickedBy() {
-        try{
+        try {
             int x = in.readInt();
             int y = in.readInt();
             int value = in.readInt();
             int player = in.readInt();
-            panel.addMsgGui("Player "+ player+ " clicked at the position (X : "+x+", Y : "+y+") :"+value);
-            panel.getCaseXY(x,y).setClickedTrueAndValueAndPlayerId(value, player);
-        }catch (IOException e){
+            panel.addMsgGui("Player " + player + " clicked at the position (X : " + x + ", Y : " + y + ") :" + value);
+            panel.getCaseXY(x, y).setClickedTrueAndValueAndPlayerId(value, player);
+        } catch (IOException e) {
             panel.addMsgGui("Error while receiving case click information.");
             e.printStackTrace();
         }
@@ -377,6 +401,7 @@ public class Demineur extends JFrame implements Runnable {
 
     /**
      * Make possible to know the type of the game : online or local.
+     *
      * @return The state of the game. True means that the game is with a server (online)
      */
     public boolean isOnlineGame() {
@@ -385,6 +410,7 @@ public class Demineur extends JFrame implements Runnable {
 
     /**
      * Set the type of game (online or local)
+     *
      * @param onlineGame Boolean, true means the state will be put to online game and false to local.
      */
     public void setOnlineGame(boolean onlineGame) {
@@ -393,18 +419,23 @@ public class Demineur extends JFrame implements Runnable {
 
     /**
      * Will send the command and the information of the position (x,y) of the case clicked
+     *
      * @param x Integer of the horizontal axe value of the clicked case.
      * @param y Integer of the vertical axe value of the clicked case.
      */
     public void sendClick(int x, int y) {
-        try{
-            out.writeUTF(Commands.POSITION.name()); //Send the command that describe the information that will follow
-            out.writeInt(x);
-            out.writeInt(y);
-        }catch (IOException e){
-            System.out.println("Error while sending click position information (X : "+x+", Y : "+y+").");
-            panel.addMsgGui("Error while sending click position information (X : "+x+", Y : "+y+").");
-            e.printStackTrace();
+        if (gameStarted) {
+            try {
+                out.writeUTF(Commands.POSITION.name()); //Send the command that describe the information that will follow
+                out.writeInt(x);
+                out.writeInt(y);
+            } catch (IOException e) {
+                System.out.println("Error while sending click position information (X : " + x + ", Y : " + y + ").");
+                panel.addMsgGui("Error while sending click position information (X : " + x + ", Y : " + y + ").");
+                e.printStackTrace();
+            }
+        }else{
+            panel.addMsgGui("Game not yet started by server.");
         }
     }
 }
