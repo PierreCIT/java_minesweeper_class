@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class ServeurDemineur extends JFrame implements Runnable {
@@ -35,6 +36,8 @@ public class ServeurDemineur extends JFrame implements Runnable {
         pack();
         setVisible(true);
 
+        //cheat to test
+        mineField.print();
         caseClicked = new boolean[mineField.getDimX()][mineField.getDimY()]; //Initialized to all false
         startServer();
     }
@@ -127,10 +130,15 @@ public class ServeurDemineur extends JFrame implements Runnable {
                     guiServer.addDialogText("Player " + playerId + " clicked on (X : " + X + ", Y : " + Y + ").");
                     caseClicked[X][Y] = true; //Set the case as clicked.
                     broadcastClick(playerId, X, Y);
-                    if (!mineField.isMine(X, Y)) //If the player didn't clicked on a mine is score is increase
+                    if (!mineField.isMine(X, Y)) { //If the player didn't clicked on a mine is score is increase
                         playerScoreList.set(playerId, playerScoreList.get(playerId) + 1); // The score of this player is increased
-                    else
+                        if (isWin()) {
+                            playerFinishedGame(playerId);
+                        }
+                    } else {
                         playerScoreList.set(playerId, -1); //Score of -1 means he lost
+                        youLostClient(playerId);
+                    }
                     //TODO: What to do if everyone has lost
                 } else {
                     guiServer.addDialogText("Case already clicked : Player " + playerId + " clicked on (X : " + X +
@@ -142,6 +150,106 @@ public class ServeurDemineur extends JFrame implements Runnable {
             }
         } else {
             guiServer.addDialogText("Error: player" + playerId + " lost but is still sending click data.");
+        }
+    }
+
+    /**
+     * Actions to perform when a player finished the game. We will then compute the scores and show the ranking
+     * as well as inform the player who won
+     *
+     * @param playerId Integer of the playerId who finished the game.
+     */
+    private void playerFinishedGame(int playerId) {
+        //Send to all players the information that the game is finished
+        try {
+            int i = 0;
+            for (DataOutputStream out : outList) { //For all output stream saved (broadcast)
+                if (playerSateList.get(i)) { //If the player state is still alive
+                    out.writeUTF(Commands.FINISHGAME.name()); //Send the command
+                }
+                i++;
+            }
+            broadcastMSG("Player " + playerId + " finished the game !"); //Broadcast the information
+            computeScores();
+        } catch (IOException e) {
+            guiServer.addDialogText("Error while sending information that a player " + playerId + " finished" +
+                    "the game.");
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Compute the ranking for each player and broadcast it. Sends a special command to the winner.
+     */
+    private void computeScores() {
+        int max = Collections.max(playerScoreList);
+        int nbExAequo = Collections.frequency(playerScoreList, max);
+        if (nbExAequo == 1) {
+            int playerIdWinner = playerScoreList.indexOf(max);
+            try {
+                outList.get(playerIdWinner).writeUTF("WIN");
+                broadcastMSG("Player " + playerIdWinner + " won !");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else { // If several player with the same score
+            List<Integer> listWinnners = new ArrayList<Integer>();
+            for (int i = 0; i < playerScoreList.size(); i++) {
+                if (playerScoreList.get(i) == max) {
+                    listWinnners.add(i);
+                }
+            }
+            broadcastMSG("Several winners : ");
+            for (int i = 0; i < listWinnners.size(); i++) {
+                try {
+                    outList.get(listWinnners.get(i)).writeUTF("WIN");
+                    broadcastMSG("Player " + listWinnners.get(i) + " won !");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+    }
+
+    /**
+     * Check the state of the game and answer to the question : Is it a victory ? True then the last click was the click
+     * of victory and false otherwise
+     *
+     * @return A boolean answering the question is the game won ?
+     */
+    private boolean isWin() {
+        return mineField.getNbMines() + nbCaseClicked() >= mineField.getDimY() * mineField.getDimX();
+    }
+
+    /**
+     * Sum the all the score of the game
+     *
+     * @return The number of case clicked
+     */
+    private int nbCaseClicked() {
+        int sum = 0;
+        for (int x = 0; x < mineField.getDimX(); x++) {
+            for (int y = 0; y < mineField.getDimY(); y++) {
+                if (caseClicked[x][y]) {
+                    sum++;
+                }
+            }
+        }
+        return sum;
+    }
+
+    /**
+     * Send to the player the information that he lost
+     *
+     * @param playerId Integer of the id of the player who the message you lost must be send
+     */
+    private void youLostClient(int playerId) {
+        try {
+            outList.get(playerId).writeUTF(Commands.LOST.name());
+        } catch (IOException e) {
+            guiServer.addDialogText("Error while sending information that a player " + playerId + " lost.");
+            e.printStackTrace();
         }
     }
 

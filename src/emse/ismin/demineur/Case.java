@@ -19,6 +19,7 @@ class Case extends JPanel implements MouseListener {
     private int y;
     private Demineur demin;
     private int value = 0; //Only used when playing online. It will contain the value to show or mines if -1
+    private int playerIdClicked = 0; //Only used when playing online. It will contain the id of the player who clicked
 
     private final static int GRAY = 0x9E9E9E; //0
     private final static int BLUE = 0x1547EB; //1
@@ -29,6 +30,7 @@ class Case extends JPanel implements MouseListener {
     private final static int DARKORANGE = 0xF49E03; //6
     private final static int RED = 0xF43803; //7
     private final static int FLASHRED = 0xFA0303;//8
+    private final static int BLACK = 0x333333;//9
 
 
     public Case(int x, int y, Demineur demin) {
@@ -66,16 +68,20 @@ class Case extends JPanel implements MouseListener {
                     }
                 }
             } else { //Behavior when in online mode.
-                if(value == -1){
+                if (value == -1) {
                     try {
+                        gc.setColor(new Color(handleColor(playerIdClicked)));
+                        gc.fillRect(0, 0, getWidth(), getHeight());
                         BufferedImage image = ImageIO.read(new File("img/bomb.png"));
                         gc.drawImage(image, 3, 3, getWidth() - 3, getHeight() - 3, this);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                }else{
-                    gc.setColor(new Color(handleColor(value)));
+                } else {
+                    //The color of the background depends on the playerId who clicked the case
+                    gc.setColor(new Color(handleColor(playerIdClicked)));
                     gc.fillRect(0, 0, getWidth(), getHeight());
+                    gc.setFont(new Font("default", Font.BOLD, 16));
                     gc.setColor(new Color(0, 0, 0));
                     if (value != 0) {
                         gc.drawString(String.valueOf(value), getHeight() / 2, getWidth() / 2);
@@ -115,10 +121,8 @@ class Case extends JPanel implements MouseListener {
             case 8:
                 resultColor = FLASHRED;
                 break;
-
-
             default:
-                resultColor = GRAY;
+                resultColor = BLACK;
                 break;
         }
         return resultColor;
@@ -182,7 +186,9 @@ class Case extends JPanel implements MouseListener {
                 }
             }
         } else { //Behavior in online game mode.
-            demin.sendClick(x, y);
+            if (!demin.isLost()) {
+                demin.sendClick(x, y);
+            }
         }
     }
 
@@ -218,9 +224,10 @@ class Case extends JPanel implements MouseListener {
         return clicked;
     }
 
-    public void setClickedTrueAndValue(int value){
+    public void setClickedTrueAndValueAndPlayerId(int value, int playerId) {
         clicked = true;
         this.value = value;
+        this.playerIdClicked = playerId;
         repaint();
     }
 }

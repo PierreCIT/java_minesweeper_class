@@ -216,21 +216,23 @@ public class Demineur extends JFrame implements Runnable {
      */
     public void disconnect() {
         onlineGame = false; //Disconnecting from server so the type of game returns to default : local.
-        connected = false; //Indicates that we are no longer connected to a server.
-        try {
-            out.writeUTF(Commands.CLIENTDISCONNECT.name());
-            in.close();
-            out.close();
-            sock.close();
-            System.out.println("Disconnected from server.\n");
-            panel.coDecoButtonChangeText();
-            panel.setNewGameButtonState(true);
-            process = null; //We kill the process that was waiting for messages from the server
-            panel.addMsgGui("You disconnected from server.");
-        } catch (IOException e) {
-            panel.addMsgGui("Error while disconnecting from server.");
-            System.out.println("Error while disconnecting from server.");
-            e.printStackTrace();
+        if(connected) { //We don't need to disconnect if we are not connected
+            connected = false; //Indicates that we are no longer connected to a server.
+            try {
+                out.writeUTF(Commands.CLIENTDISCONNECT.name());
+                in.close();
+                out.close();
+                sock.close();
+                System.out.println("Disconnected from server.\n");
+                panel.coDecoButtonChangeText();
+                panel.setNewGameButtonState(true);
+                process = null; //We kill the process that was waiting for messages from the server
+                panel.addMsgGui("You disconnected from server.");
+            } catch (IOException e) {
+                panel.addMsgGui("Error while disconnecting from server.");
+                System.out.println("Error while disconnecting from server.");
+                e.printStackTrace();
+            }
         }
     }
 
@@ -285,6 +287,7 @@ public class Demineur extends JFrame implements Runnable {
                 break;
             case "SERVERSTOPPED":
                 gameStarted = false;
+                connected = false;
                 panel.addMsgGui("The server has closed.");
                 panel.setNewGameButtonState(true);
                 process = null; //Close listening thread
@@ -298,10 +301,46 @@ public class Demineur extends JFrame implements Runnable {
                     e.printStackTrace();
                 }
                 break;
+            case "LOST":
+                lostExploded();
+                break;
+            case "FINISHGAME":
+                finishGamePopUp();
+                break;
+            case "WIN":
+                won();
+                break;
             default:
                 System.out.println("Error: command from server not understood: " + cmd + "\n");
                 panel.addMsgGui("Error: command from server not understood : " + cmd);
         }
+    }
+
+    /**
+     * Popup to inform player the game is finished.
+     */
+    private void finishGamePopUp() {
+        lost=true;
+        JOptionPane.showConfirmDialog(null, "The game is finished. Check scores to see your " +
+                        "rank", "End of the game", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    /**
+     * The player won we will show a popup to inform him. And we will handle game states.
+     */
+    private void won() {
+        JOptionPane.showConfirmDialog(null, "Congratulations ! You WON ! "
+                , "End of the game", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    /**
+     * Action to perform when player exploded by clicking on a mine
+     */
+    private void lostExploded() {
+        lost=true;
+        panel.addMsgGui("You lost !");
+        JOptionPane.showConfirmDialog(null, "BOOM ! GAME OVER !", "Game Over",
+                JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
     }
 
     /**
@@ -315,7 +354,7 @@ public class Demineur extends JFrame implements Runnable {
             int value = in.readInt();
             int player = in.readInt();
             panel.addMsgGui("Player "+ player+ " clicked at the position (X : "+x+", Y : "+y+") :"+value);
-            panel.getCaseXY(x,y).setClickedTrueAndValue(value);
+            panel.getCaseXY(x,y).setClickedTrueAndValueAndPlayerId(value, player);
         }catch (IOException e){
             panel.addMsgGui("Error while receiving case click information.");
             e.printStackTrace();
