@@ -52,7 +52,7 @@ public class GUIServer extends JPanel implements ActionListener {
                 main.gameStarted();
                 startB.setText("End Game");
                 main.broadcastMSG("Game started");
-                main.newGame();
+                main.newGameServer();
                 listLevels.setEnabled(false);
             } else {
                 startB.setText("Start");
@@ -75,28 +75,29 @@ public class GUIServer extends JPanel implements ActionListener {
                     if (main.getLevel() != Level.EASY) {
                         addDialogText("Level changed to EASY");
                         main.setLevel(Level.EASY);
-                        main.newGame();
+                        main.newGameServer();
                     }
                     break;
                 case "MEDIUM":
                     if (main.getLevel() != Level.MEDIUM) {
                         addDialogText("Level changed to MEDIUM");
                         main.setLevel(Level.MEDIUM);
-                        main.newGame();
+                        main.newGameServer();
                     }
                     break;
                 case "HARD":
                     if (main.getLevel() != Level.HARD) {
                         addDialogText("Level changed to HARD");
                         main.setLevel(Level.HARD);
-                        main.newGame();
+                        main.newGameServer();
                     }
                     break;
                 case "CUSTOM":
                     if (main.getLevel() != Level.CUSTOM) {
                         addDialogText("Level changed to CUSTOM");
                         main.setLevel(Level.CUSTOM);
-                        main.newGame();
+                        main.getMineField().getDimsOptionPanel();
+                        main.newGameServer();
                     }
                     break;
                 default:

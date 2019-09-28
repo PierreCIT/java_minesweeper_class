@@ -26,7 +26,6 @@ public class ServeurDemineur extends JFrame implements Runnable {
     private boolean[][] caseClicked; //Array that will represent the mine field and which field was already clicked
     private List<Integer> playerScoreList = new ArrayList<Integer>(); //Will contain a score for each player (0 initially)
 
-
     ServeurDemineur() {
         System.out.println("Server starting ...");
         //Create GUI
@@ -126,6 +125,19 @@ public class ServeurDemineur extends JFrame implements Runnable {
         }
     }
 
+    /**
+     * A getter of the mine field
+     * @return Champ: The current mines filed object
+     */
+    public Champ getMineField() {
+        return mineField;
+    }
+
+    /**
+     * Managethe information of a click from a player. It will manage if the case was already clicked, if the player
+     * lost, won or simply finished the game and lauch the followinf process accordingly.
+     * @param playerId  Integer which is the Id of the player who clicked.
+     */
     synchronized private void caseClicked(int playerId) {
         if (playerScoreList.get(playerId) != -1) { // If the player didn't lose
             try {
@@ -421,15 +433,23 @@ public class ServeurDemineur extends JFrame implements Runnable {
     /**
      * Place new mines according to the level and send the information to the client.
      */
-    synchronized public void newGame() {
+    synchronized public void newGameServer() {
         try {
-            mineField.newGame(level);
+            if(level==Level.CUSTOM){
+                mineField.newGame(level, mineField.getDimXCustom(), mineField.getDimYCustom());
+            }else{
+                mineField.newGame(level);
+            }
             caseClicked = new boolean[mineField.getDimX()][mineField.getDimY()]; //Set a new case clicked
             int i = 0;
             for (DataOutputStream out : outList) { //For all output stream saved (broadcast)
                 if (playerSateList.get(i)) { //If the player state is still alive
                     out.writeUTF("LEVEL"); //Send the command
                     out.writeUTF(level.name()); //Send the command
+                    if(level==Level.CUSTOM){
+                        out.writeInt(mineField.getDimXCustom());
+                        out.writeInt(mineField.getDimYCustom());
+                    }
                     out.writeUTF(Commands.NEWGAME.name()); //Send the command
                     playerScoreList.set(i, 0); //Reset values scores.
                 }

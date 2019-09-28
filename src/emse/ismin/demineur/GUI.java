@@ -23,6 +23,7 @@ public class GUI extends JPanel implements ActionListener {
     private JMenuItem mEasy;
     private JMenuItem mMedium;
     private JMenuItem mHard;
+    private JMenuItem mCustom;
 
     private Case[][] tabCase; //Array that will store the cases in the gridLayer
     private Compteur compteur;
@@ -121,6 +122,9 @@ public class GUI extends JPanel implements ActionListener {
         mHard = new JMenuItem("Hard");
         mHard.addActionListener(this);
         mNewParty.add(mHard);
+        mCustom = new JMenuItem("Custom");
+        mCustom.addActionListener(this);
+        mNewParty.add(mCustom);
         menuPartie.add(mNewParty);
 
 
@@ -191,6 +195,9 @@ public class GUI extends JPanel implements ActionListener {
         } else if (e.getSource() == mHard) {
             main.getChamp().newGame(Level.HARD);
             newGame(Level.HARD);
+        } else if (e.getSource() == mCustom) {
+            main.getChamp().newGame(Level.CUSTOM);
+            newGame(Level.CUSTOM);
         } else if (e.getSource() == coDiscoButton)
             if (!main.connected) {
                 main.connectServer(ipTF.getText(), Integer.parseInt(portTF.getText()), nicknameTF.getText());
@@ -232,7 +239,13 @@ public class GUI extends JPanel implements ActionListener {
      */
     public void newGame(Level level) {
         gridPannel.removeAll();
-        main.getChamp().newGame(level);
+        if (main.isOnlineGame()) {
+            if (level != Level.CUSTOM) {
+                main.getChamp().newGame(level);
+            } else {
+                main.getChamp().newGame(level, main.getDimXCustom(), main.getDimYCustom());
+            }
+        }
         placeCases();
         main.pack();
         compteur.stopCpt();
@@ -292,6 +305,7 @@ public class GUI extends JPanel implements ActionListener {
 
     /**
      * get case X,Y from GUI
+     *
      * @param X X axis position of the case to get from gridlayout
      * @param Y Y axis position of the case to get from gridlayout
      * @return The case from the grid layout at the position X, Y
@@ -302,6 +316,7 @@ public class GUI extends JPanel implements ActionListener {
 
     /**
      * Get the restart button from GUI
+     *
      * @return The Restart button from GUI
      */
     public JButton getButRestart() {

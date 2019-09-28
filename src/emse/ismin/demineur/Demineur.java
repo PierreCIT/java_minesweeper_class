@@ -32,6 +32,8 @@ public class Demineur extends JFrame implements Runnable {
     //Online game
     private boolean gameStarted = false; //Boolean that describes the state of the online game
     private boolean onlineGame = false; //Boolean that set is the game is to be played with a server or in local.
+    private int dimXCustom = 5; //Value sent by the server regarding the size (X axis) of the custom level
+    private int dimYCustom = 5; //Value sent by the server regarding the size (Y axis) of the custom level
 
     /**
      * Constructor of the 'Demineur' (MinesWeeper) which will initialize the game
@@ -126,6 +128,24 @@ public class Demineur extends JFrame implements Runnable {
      */
     public int getNbCaseClicked() {
         return this.nbCaseClicked;
+    }
+
+    /**
+     * Get the X axis dimension
+     *
+     * @return Integer value of the X axis dimension
+     */
+    public int getDimXCustom() {
+        return dimXCustom;
+    }
+
+    /**
+     * Get the Y axis dimension
+     *
+     * @return Integer value of the Y axis dimension
+     */
+    public int getDimYCustom() {
+        return dimYCustom;
     }
 
     /**
@@ -301,13 +321,13 @@ public class Demineur extends JFrame implements Runnable {
                 }
                 break;
             case "LOST":
-                gameStarted =false;
+                gameStarted = false;
                 panel.getCompteur().stopCpt();
                 lostExploded();
                 break;
             case "FINISHGAME":
                 panel.getCompteur().stopCpt();
-                gameStarted=false;
+                gameStarted = false;
                 finishGamePopUp();
                 break;
             case "LEVEL":
@@ -317,7 +337,7 @@ public class Demineur extends JFrame implements Runnable {
                 panel.newGame(level);
                 break;
             case "WIN":
-                gameStarted =false;
+                gameStarted = false;
                 won();
                 break;
             default:
@@ -325,6 +345,7 @@ public class Demineur extends JFrame implements Runnable {
                 panel.addMsgGui("Error: command from server not understood : " + cmd);
         }
     }
+
     /**
      * Recive new level information from server
      */
@@ -332,6 +353,10 @@ public class Demineur extends JFrame implements Runnable {
         try {
             String levelTemp = in.readUTF();
             level = Level.valueOf(levelTemp);
+            if (level == Level.CUSTOM) {
+                dimXCustom = in.readInt();
+                dimYCustom = in.readInt();
+            }
         } catch (IOException e) {
             panel.addMsgGui("Error while receiving new level info.");
             e.printStackTrace();
@@ -433,7 +458,7 @@ public class Demineur extends JFrame implements Runnable {
                 panel.addMsgGui("Error while sending click position information (X : " + x + ", Y : " + y + ").");
                 e.printStackTrace();
             }
-        }else{
+        } else {
             panel.addMsgGui("Game not yet started by server.");
         }
     }
