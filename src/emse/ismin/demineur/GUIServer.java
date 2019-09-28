@@ -55,7 +55,7 @@ public class GUIServer extends JPanel implements ActionListener {
                 main.newGameServer();
                 listLevels.setEnabled(false);
             } else {
-                startB.setText("Start");
+                startB.setText("Start Game");
                 listLevels.setEnabled(true);
                 main.gameStopped();
             }

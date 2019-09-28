@@ -204,6 +204,7 @@ public class GUI extends JPanel implements ActionListener {
             } else {
                 main.disconnect();
                 compteur.stopCpt();
+                playerIdUpdate(0);
             }
     }
 
@@ -231,6 +232,25 @@ public class GUI extends JPanel implements ActionListener {
         }
         compteur.stopCpt();
         main.newGame();
+    }
+
+    /**
+     * Update the GUI with the player ID information, indicate players color and ID
+     *
+     * @param playerId Integer
+     */
+    public void playerIdUpdate(int playerId) {
+        if(main.isOnlineGame()) {
+            ipTF.setEnabled(false);
+            portTF.setEnabled(false);
+            nicknameTF.setEnabled(false);
+            connectPanel.setBackground(new Color(tabCase[0][0].handleColor(playerId)));
+        }else{
+            ipTF.setEnabled(true);
+            portTF.setEnabled(true);
+            nicknameTF.setEnabled(true);
+            connectPanel.setBackground(null); //default color
+        }
     }
 
     /**

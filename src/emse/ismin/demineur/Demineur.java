@@ -34,12 +34,13 @@ public class Demineur extends JFrame implements Runnable {
     private boolean onlineGame = false; //Boolean that set is the game is to be played with a server or in local.
     private int dimXCustom = 5; //Value sent by the server regarding the size (X axis) of the custom level
     private int dimYCustom = 5; //Value sent by the server regarding the size (Y axis) of the custom level
+    private int playerId = 0;
 
     /**
      * Constructor of the 'Demineur' (MinesWeeper) which will initialize the game
      */
     public Demineur() {
-        super("Demineur connecté");
+        super("MinesWeeper connected");
         champMines.print();
         panel = new GUI(this);
         setContentPane(panel);
@@ -131,6 +132,15 @@ public class Demineur extends JFrame implements Runnable {
     }
 
     /**
+     * Get player id sent by server
+     *
+     * @return Integer of the player ID
+     */
+    public int getPlayerId() {
+        return playerId;
+    }
+
+    /**
      * Get the X axis dimension
      *
      * @return Integer value of the X axis dimension
@@ -193,6 +203,15 @@ public class Demineur extends JFrame implements Runnable {
     }
 
     /**
+     * Give info if the server started the game or not
+     *
+     * @return The sate of the game from the last server update
+     */
+    public boolean isGameStarted() {
+        return gameStarted;
+    }
+
+    /**
      * Initializes connection with the server given the address of the server and create in and out dataStream.
      * It will also send a first message containing the pseudo of the player. It will then launch a thread that*
      * will listen for data from the server.
@@ -238,6 +257,7 @@ public class Demineur extends JFrame implements Runnable {
     synchronized public void disconnect() {
         onlineGame = false; //Disconnecting from server so the type of game returns to default : local.
         process = null; //We kill the process that was waiting for messages from the server
+        noPlayerId();
         if (connected) { //We don't need to disconnect if we are not connected
             connected = false; //Indicates that we are no longer connected to a server.
             try {
@@ -291,6 +311,10 @@ public class Demineur extends JFrame implements Runnable {
                 break;
             case "POSITION":
                 caseClickedBy();
+                break;
+            case "PLAYERID":
+                readAndChangeGUIPlayerID();
+                break;
             case "STARTGAME":
                 gameStarted = true;
                 panel.getCompteur().startCpt();
@@ -301,6 +325,7 @@ public class Demineur extends JFrame implements Runnable {
                 panel.getCompteur().stopCpt();
                 panel.setNewGameButtonState(true);
                 panel.addMsgGui("Game ended by the server.");
+                noPlayerId();
                 break;
             case "SERVERSTOPPED":
                 gameStarted = false;
@@ -310,6 +335,7 @@ public class Demineur extends JFrame implements Runnable {
                 panel.setNewGameButtonState(true);
                 panel.coDecoButtonChangeText();
                 process = null; //Close listening thread
+                noPlayerId();
                 try {
                     in.close();
                     out.close();
@@ -344,6 +370,27 @@ public class Demineur extends JFrame implements Runnable {
                 System.out.println("Error: command from server not understood: " + cmd + "\n");
                 panel.addMsgGui("Error: command from server not understood : " + cmd);
         }
+    }
+
+    /**
+     * Will read the player ID sent by the server and make the interface modification accordingly
+     */
+    private void readAndChangeGUIPlayerID() {
+        try {
+            playerId = in.readInt();
+            panel.playerIdUpdate(playerId);
+            this.setTitle("Player " + playerId + " | MinesWeeper connected");
+        } catch (IOException e) {
+            panel.addMsgGui("Error while receiving new playerId.");
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Called when the client has no more player Id
+     */
+    private void noPlayerId() {
+        this.setTitle("MinesWeeper connected");
     }
 
     /**

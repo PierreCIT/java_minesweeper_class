@@ -70,13 +70,12 @@ public class ServeurDemineur extends JFrame implements Runnable {
         String command;
         int playerId = -1; //Default value, negative because it should not be seen
         try {
-            System.out.println("Thread " + playerIds + " Started");
             playerId = playerIds;
             playerIds++;
             Socket socket = manageSock.accept(); //New client connected
             if (gameStarted) {
-                playerScoreList.add(-1);
-            }//If a player join while the game is started he is set to lost
+                playerScoreList.add(-1); //If a player join while the game is started he is set to lost
+            }
             else {
                 playerScoreList.add(0);
             }
@@ -88,8 +87,10 @@ public class ServeurDemineur extends JFrame implements Runnable {
             inList.add(in);
             outList.add(out);
             guiServer.addDialogText("New connexion " + namePlayer + ", set as player " + playerId);
-            out.writeUTF("MSG");//Send the command message to the client
+            out.writeUTF(Commands.MSG.name());//Send the command message to the client
             out.writeUTF("Connected as player " + playerId + "."); //Sent info connection confirmation to the client
+            out.writeUTF(Commands.PLAYERID.name());
+            out.writeInt(playerId);
 
             while (playerSateList.get(playerId)) { //While the player sate is alive keep waiting for data
                 command = in.readUTF();
@@ -139,38 +140,43 @@ public class ServeurDemineur extends JFrame implements Runnable {
      * @param playerId  Integer which is the Id of the player who clicked.
      */
     synchronized private void caseClicked(int playerId) {
-        if (playerScoreList.get(playerId) != -1) { // If the player didn't lose
-            try {
-                int X = inList.get(playerId).readInt();
-                int Y = inList.get(playerId).readInt();
-                if (!caseClicked[X][Y]) {//If the case has not been clicked already
-                    guiServer.addDialogText("Player " + playerId + " clicked on (X : " + X + ", Y : " + Y + ").");
-                    caseClicked[X][Y] = true; //Set the case as clicked.
-                    broadcastClick(playerId, X, Y);
-                    if (!lastPlayerAlive()) {
-                        if (!mineField.isMine(X, Y)) { //If the player didn't clicked on a mine is score is increase
-                            playerScoreList.set(playerId, playerScoreList.get(playerId) + 1); // The score of this player is increased
-                            if (isWin()) {
-                                playerFinishedGame(playerId);
+        if(gameStarted) {
+            if (playerScoreList.get(playerId) != -1) { // If the player didn't lose
+                try {
+                    int X = inList.get(playerId).readInt();
+                    int Y = inList.get(playerId).readInt();
+                    if (!caseClicked[X][Y]) {//If the case has not been clicked already
+                        guiServer.addDialogText("Player " + playerId + " clicked on (X : " + X + ", Y : " + Y + ").");
+                        caseClicked[X][Y] = true; //Set the case as clicked.
+                        broadcastClick(playerId, X, Y);
+                        if (!lastPlayerAlive()) {
+                            if (!mineField.isMine(X, Y)) { //If the player didn't clicked on a mine is score is increase
+                                playerScoreList.set(playerId, playerScoreList.get(playerId) + 1); // The score of this player is increased
+                                if (isWin()) {
+                                    playerFinishedGame(playerId);
+                                }
+                            } else {
+                                playerScoreList.set(playerId, -1); //Score of -1 means he lost
+                                youLostClient(playerId);
                             }
                         } else {
-                            playerScoreList.set(playerId, -1); //Score of -1 means he lost
-                            youLostClient(playerId);
+                            playerFinishedGame(playerId);
                         }
+                        //TODO: What to do if everyone has lost
                     } else {
-                        playerFinishedGame(playerId);
+                        guiServer.addDialogText("Case already clicked : Player " + playerId + " clicked on (X : " + X +
+                                ", Y : " + Y + ").");
                     }
-                    //TODO: What to do if everyone has lost
-                } else {
-                    guiServer.addDialogText("Case already clicked : Player " + playerId + " clicked on (X : " + X +
-                            ", Y : " + Y + ").");
+                } catch (IOException e) {
+                    guiServer.addDialogText("Error while receiving position information from client " + playerId);
+                    e.printStackTrace();
                 }
-            } catch (IOException e) {
-                guiServer.addDialogText("Error while receiving position information from client " + playerId);
-                e.printStackTrace();
+            } else {
+                guiServer.addDialogText("Error: player" + playerId + " lost but is still sending click data.");
             }
-        } else {
-            guiServer.addDialogText("Error: player" + playerId + " lost but is still sending click data.");
+        }else{
+            guiServer.addDialogText("Error "+ playerId + " send click position information but the game is" +
+                    " not started.");
         }
     }
 

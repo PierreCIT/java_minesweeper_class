@@ -68,7 +68,7 @@ class Case extends JPanel implements MouseListener {
                     }
                 }
             } else { //Behavior when in online mode.
-                if (value == -1) {
+                if (value == -1) { //If the player clicked on a bomb
                     try {
                         gc.setColor(new Color(handleColor(playerIdClicked)));
                         gc.fillRect(0, 0, getWidth(), getHeight());
@@ -91,7 +91,7 @@ class Case extends JPanel implements MouseListener {
         }
     }
 
-    private int handleColor(int nbMinesSurrounding) {
+    public int handleColor(int nbMinesSurrounding) {
         int resultColor;
         switch (nbMinesSurrounding) {
             case 0:
@@ -224,7 +224,7 @@ class Case extends JPanel implements MouseListener {
         return clicked;
     }
 
-    public void setClickedTrueAndValueAndPlayerId(int value, int playerId) {
+    synchronized public void setClickedTrueAndValueAndPlayerId(int value, int playerId) {
         clicked = true;
         this.value = value;
         this.playerIdClicked = playerId;
