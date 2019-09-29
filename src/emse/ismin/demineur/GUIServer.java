@@ -9,7 +9,7 @@ import java.awt.event.ActionListener;
  * Class that defines the GUI of the server.
  */
 public class GUIServer extends JPanel implements ActionListener {
-    private ServeurDemineur main;
+    private ServerMinesWeeper main;
     private JButton startB; // Button to use to start the server
     private JButton closeServerB; // Button to use to close the server and all connections
     private JPanel southButtonsP;
@@ -17,7 +17,7 @@ public class GUIServer extends JPanel implements ActionListener {
     private String[] levels = {Level.EASY.name(), Level.MEDIUM.name(), Level.HARD.name(), Level.CUSTOM.name()};
     private JComboBox listLevels;
 
-    public GUIServer(ServeurDemineur server) {
+    public GUIServer(ServerMinesWeeper server) {
         main = server;
         setLayout(new BorderLayout());
 

@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * Class of the server that manages connections, the players and the game : the entire server.
  */
-public class ServeurDemineur extends JFrame implements Runnable {
+public class ServerMinesWeeper extends JFrame implements Runnable {
     private GUIServer guiServer;
     private ServerSocket manageSock;
     private static final int serverPort = 10000; //Default server port
@@ -28,7 +28,7 @@ public class ServeurDemineur extends JFrame implements Runnable {
     //List that will contain all the information of all the players
     private List<Player> playersList = new ArrayList<Player>();
 
-    ServeurDemineur() {
+    ServerMinesWeeper() {
         System.out.print("Server starting ... ");
         //Create GUI
         guiServer = new GUIServer(this);
@@ -54,7 +54,7 @@ public class ServeurDemineur extends JFrame implements Runnable {
     }
 
     public static void main(String[] args) {
-        new ServeurDemineur();
+        new ServerMinesWeeper();
     }
 
     public void startGame() {
