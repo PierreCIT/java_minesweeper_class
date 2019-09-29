@@ -19,6 +19,11 @@ class WriteScoreInFile {
     WriteScoreInFile() {
     }
 
+    /**
+     * Save the scores of the players, when playing online
+     * @param playerList The list of all players
+     * @param level Level of the game of the scores to save
+     */
     void writeOnlineScoreInScoreOnlineFile(List<Player> playerList, Level level) {
         File dir = new File("."); //Current directory
         String loc = null;
@@ -58,6 +63,12 @@ class WriteScoreInFile {
         }
     }
 
+    /**
+     * Saves score in a file when playing in local
+     * @param score Score to save
+     * @param exploded Boolean to say if the player exploded (lost) or not
+     * @param level Level of the game to saves the scores
+     */
     void writeLocalScoreInScoreFile(int score, boolean exploded, Level level) {
         File dir = new File("."); //Current directory
         String loc = null;

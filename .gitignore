@@ -1,5 +1,5 @@
 .idea
 out
 javadoc
-./Scores.dat
-./ScoresOnline.dat
+Scores.dat
+ScoresOnline.dat
