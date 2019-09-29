@@ -19,7 +19,7 @@ class WriteScoreInFile {
     WriteScoreInFile() {
     }
 
-    void writeOnlineScoreInScoreOnlineFile(List<Player> playerList) {
+    void writeOnlineScoreInScoreOnlineFile(List<Player> playerList, Level level) {
         File dir = new File("."); //Current directory
         String loc = null;
         try {
@@ -31,7 +31,7 @@ class WriteScoreInFile {
 
             out.write(dashLine);
             out.newLine();
-            out.write("Game of the : " + dtf.format(now));
+            out.write("Game of the : " + dtf.format(now) + ", level : " + level.name());
             out.newLine();
             for (Player player : playerList) {
                 if (player.isInGame()) {
@@ -58,7 +58,7 @@ class WriteScoreInFile {
         }
     }
 
-    void writeLocalScoreInScoreFile(int score, boolean exploded) {
+    void writeLocalScoreInScoreFile(int score, boolean exploded, Level level) {
         File dir = new File("."); //Current directory
         String loc = null;
         try {
@@ -70,7 +70,7 @@ class WriteScoreInFile {
 
             out.write(dashLine);
             out.newLine();
-            out.write("Game of the : " + dtf.format(now));
+            out.write("Game of the : " + dtf.format(now) + ", level : " + level.name());
             out.newLine();
             String msg = " Score: " + score;
             if (exploded) {

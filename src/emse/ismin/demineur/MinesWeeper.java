@@ -173,7 +173,7 @@ public class MinesWeeper extends JFrame implements Runnable {
      * @param score Integer of the score of the player to save.
      */
     void saveScore(int score) {
-        writeLocalScoreInFile.writeLocalScoreInScoreFile(score, isLost());
+        writeLocalScoreInFile.writeLocalScoreInScoreFile(score, isLost(), level);
     }
 
     /**

@@ -263,7 +263,7 @@ public class ServerMinesWeeper extends JFrame implements Runnable {
                 }
             }
         }
-        fileScoreWriter.writeOnlineScoreInScoreOnlineFile(playersList);
+        fileScoreWriter.writeOnlineScoreInScoreOnlineFile(playersList, level);
         deleteDisconnectedPlayers();
     }
 
