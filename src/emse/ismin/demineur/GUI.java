@@ -174,11 +174,6 @@ public class GUI extends JPanel implements ActionListener {
                 "About", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE);
     }
 
-    /**
-     * Listener of events in the panel
-     *
-     * @param e ActionEvent variable
-     */
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == butQuit) {

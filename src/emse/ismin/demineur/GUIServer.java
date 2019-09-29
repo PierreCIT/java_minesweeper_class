@@ -50,11 +50,6 @@ public class GUIServer extends JPanel implements ActionListener {
         dialog.append(newMsg + "\n");
     }
 
-    /**
-     * Event of a click
-     *
-     * @param e Event
-     */
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == startB) {

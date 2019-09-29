@@ -145,21 +145,11 @@ class Case extends JPanel implements MouseListener {
         repaint();
     }
 
-    /**
-     * Event
-     *
-     * @param e Event
-     */
     @Override
     public void mouseClicked(MouseEvent e) {
 
     }
 
-    /**
-     * Handle mouse
-     *
-     * @param e event
-     */
     @Override
     public void mousePressed(MouseEvent e) {
         if (!minesWeeperMain.isOnlineGame()) { //Behavior when in local game mode.
@@ -209,31 +199,16 @@ class Case extends JPanel implements MouseListener {
         }
     }
 
-    /**
-     * Event
-     *
-     * @param e Event
-     */
     @Override
     public void mouseReleased(MouseEvent e) {
 
     }
 
-    /**
-     * Event
-     *
-     * @param e Event
-     */
     @Override
     public void mouseEntered(MouseEvent e) {
 
     }
 
-    /**
-     * Event
-     *
-     * @param e Event
-     */
     @Override
     public void mouseExited(MouseEvent e) {
 
