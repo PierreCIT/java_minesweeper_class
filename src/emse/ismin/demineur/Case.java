@@ -10,7 +10,8 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * A class that draw and acualize a Jpanel when clicked
+ * A class that draw and actualize a JPanel when clicked.
+ * It corresponds to one case of the mine field.
  */
 class Case extends JPanel implements MouseListener {
     private final static int DIM = 50;

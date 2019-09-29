@@ -25,6 +25,8 @@ public class ServeurDemineur extends JFrame implements Runnable {
     private Champ mineField = new Champ(level); //Start a new mine field with easy parameter by default
     private boolean[][] caseClicked; //Array that will represent the mine field and which field was already clicked
     private List<Integer> playerScoreList = new ArrayList<Integer>(); //Will contain a score for each player (0 initially)
+    //List that will contain all the information of all the players
+    private List<Player> playersList= new ArrayList<Player>();
 
     ServeurDemineur() {
         System.out.println("Server starting ...");
@@ -46,6 +48,7 @@ public class ServeurDemineur extends JFrame implements Runnable {
             //Start socket management
             manageSock = new ServerSocket(serverPort);
             //Thread to wait for client
+            System.out.println("Server started.");
             new Thread(this).start();
         } catch (IOException e) {
             e.printStackTrace();
@@ -73,17 +76,14 @@ public class ServeurDemineur extends JFrame implements Runnable {
             playerId = playerIds;
             playerIds++;
             Socket socket = manageSock.accept(); //New client connected
-            if (gameStarted) {
-                playerScoreList.add(-1); //If a player join while the game is started he is set to lost
-            }
-            else {
-                playerScoreList.add(0);
-            }
             playerSateList.add(true);
             new Thread(this).start(); //Wait for new client
             DataInputStream in = new DataInputStream(socket.getInputStream());
             DataOutputStream out = new DataOutputStream(socket.getOutputStream());
             String namePlayer = in.readUTF(); //Wait for first message which shall contain the player's name
+            Player player = new Player(namePlayer, playerId);
+            player.setInGame(!gameStarted); //If a player join while the game is started he is set to not be inGame
+            playersList.add(player);
             inList.add(in);
             outList.add(out);
             guiServer.addDialogText("New connexion " + namePlayer + ", set as player " + playerId);
@@ -465,5 +465,29 @@ public class ServeurDemineur extends JFrame implements Runnable {
             guiServer.addDialogText("Error while sending new game information : " + level);
             e.printStackTrace();
         }
+    }
+
+    public Player getPlayerById(int playerIdToLookFor){
+        for (int i = 0; i < playersList.size(); i++) {
+            if(playersList.get(i).getPlayerId() == playerIdToLookFor){
+                return playersList.get(i);
+            }
+        }
+        System.out.println("Error : server looking for a playerId that is not in the list of the players.");
+        guiServer.addDialogText("Error : server looking for a playerId that is not in the list of the players.");
+        return notFoundPlayer(); //We return a false player that will be as he was dead, disconnected, not in Game, negative score
+    }
+
+    /**
+     * Create a virtual player that will fail every verification
+     * @return
+     */
+    private Player notFoundPlayer() {
+        Player notFound = new Player("notFound", -1 );
+        notFound.setInGame(false);
+        notFound.disconnected();
+        notFound.setExploded(true);
+        notFound.setScore(-2);
+        return notFound;
     }
 }
