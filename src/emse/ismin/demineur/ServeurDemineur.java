@@ -10,6 +10,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Class of the server that manages connections, the players and the game : the entire server.
+ */
 public class ServeurDemineur extends JFrame implements Runnable {
     private GUIServer guiServer;
     private ServerSocket manageSock;
@@ -25,7 +28,7 @@ public class ServeurDemineur extends JFrame implements Runnable {
     private List<Player> playersList = new ArrayList<Player>();
 
     ServeurDemineur() {
-        System.out.print("Server starting ...");
+        System.out.print("Server starting ... ");
         //Create GUI
         guiServer = new GUIServer(this);
         setContentPane(guiServer);
@@ -33,8 +36,6 @@ public class ServeurDemineur extends JFrame implements Runnable {
         pack();
         setVisible(true);
 
-        //cheat to test
-        mineField.print();
         caseClicked = new boolean[mineField.getDimX()][mineField.getDimY()]; //Initialized to all false
         startServer();
     }
@@ -399,7 +400,7 @@ public class ServeurDemineur extends JFrame implements Runnable {
     /**
      * Set the state of the game. Either started or not.
      *
-     * @param state
+     * @param state Boolean to put the state of the game to.
      */
     public void setGameStarted(boolean state) {
         gameStarted = state;
@@ -497,7 +498,7 @@ public class ServeurDemineur extends JFrame implements Runnable {
     /**
      * Create a virtual player that will fail every verification
      *
-     * @return
+     * @return A Player object that is made to fail every test.
      */
     private Player notFoundPlayer() {
         Player notFound = new Player("notFound", -1);

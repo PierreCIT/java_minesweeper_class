@@ -93,7 +93,7 @@ public class Demineur extends JFrame implements Runnable {
     /**
      * Return the interface object
      *
-     * @return
+     * @return The gui object of the UI
      */
     public GUI getGui() {
         return this.panel;

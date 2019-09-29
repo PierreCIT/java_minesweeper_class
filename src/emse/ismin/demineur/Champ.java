@@ -6,7 +6,6 @@ import java.util.Random;
 
 
 /**
- * @author Pierre SEITE
  * Class which will create the field of the MinesWeeper
  */
 public class Champ {
@@ -86,7 +85,6 @@ public class Champ {
     }
 
 
-
     /**
      * Determines the number of mines to put in the field regarding the level of difficulty
      *
@@ -99,13 +97,14 @@ public class Champ {
         } else if (level == Level.MEDIUM) {
             nbMines = NBMINESMEDIUM;
             return nbMines;
-        }else if (level == Level.CUSTOM) {
-            nbMines = (dimXCustom * dimYCustom)/10;;
+        } else if (level == Level.CUSTOM) {
+            nbMines = (dimXCustom * dimYCustom) / 10;
+            ;
             return nbMines;
-        }  else if (level == Level.HARD) {
+        } else if (level == Level.HARD) {
             nbMines = NBMINESHARD;
             return nbMines;
-        }else {
+        } else {
             System.out.println("Error number of mines for an unknown type of level requested.");
             return 5;
         }
@@ -145,8 +144,8 @@ public class Champ {
      * @param dimYServer Integer, the dimension of the Y axis
      */
     public void newGame(Level level, int dimXServer, int dimYServer) {
-        dimXCustom =dimXServer;
-        dimYCustom =dimYServer;
+        dimXCustom = dimXServer;
+        dimYCustom = dimYServer;
         this.level = level;
         if (level == Level.CUSTOM) { //This function sould only be called in the case of a Custom level
             createChamp(dimXServer, dimYServer);
@@ -219,6 +218,8 @@ public class Champ {
 
     /**
      * Select the position of a mine randomly
+     *
+     * @param nbMines Integer number of mines to place in the field
      */
     public void placesMines(int nbMines) {
         for (int x = 0; x < this.mines.length; x++) {
@@ -297,9 +298,7 @@ public class Champ {
     }
 
     /**
-     * Convert the mines position to an String with x as the mine position
-     *
-     * @return The string containing the mines field
+     * Print the mine position in the console.
      */
     public void print() {
         for (int x = 0; x < this.mines.length; x++) {

@@ -6,7 +6,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
-
+/**
+ * Class that contains the MineWeeper interface. It handles online and local game mode.
+ */
 public class GUI extends JPanel implements ActionListener {
     private Demineur main;
     private JButton butQuit;
@@ -235,7 +237,7 @@ public class GUI extends JPanel implements ActionListener {
     private void newGame() {
         for (int x = 0; x < main.getChamp().getDimX(); x++) {
             for (int y = 0; y < main.getChamp().getDimY(); y++) {
-                tabCase[x][y].newParty();
+                tabCase[x][y].newGameCase();
             }
         }
         compteur.stopCpt();
@@ -264,6 +266,8 @@ public class GUI extends JPanel implements ActionListener {
     /**
      * Asked to all cases to start a new party, and reposition the mines.
      * Take as input level when the new game is to be launch with a new level.
+     *
+     * @param level level enum of the new level of the game
      */
     public void newGame(Level level) {
         gridPannel.removeAll();
@@ -288,6 +292,8 @@ public class GUI extends JPanel implements ActionListener {
      * Will see if the adjacent cases are of the same value of the one clicked and if it is set
      * these cases to clicked through the method setClickedTrue.
      * The given case at the position x,y is already set to be clicked.
+     * @param x Integer x position of the case to find adjacent values from
+     * @param y Integer y position of the case to find adjacent values from
      */
     public void adjacentSameValue(int x, int y) {
         int borneInfX = x == 0 ? 0 : -1;

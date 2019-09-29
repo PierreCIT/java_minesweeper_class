@@ -43,7 +43,9 @@ class Case extends JPanel implements MouseListener {
     }
 
     /**
-     * The cas drawing
+     * How the case should be displayed depending on the state
+     *
+     * @param gc Default parameter
      */
     @Override
     public void paintComponent(Graphics gc) {
@@ -92,6 +94,12 @@ class Case extends JPanel implements MouseListener {
         }
     }
 
+    /**
+     * Will give a color corresponding to a value
+     *
+     * @param nbMinesSurrounding Value to use to get the color
+     * @return A constant which refers to a color
+     */
     public int handleColor(int nbMinesSurrounding) {
         int resultColor;
         switch (nbMinesSurrounding) {
@@ -132,11 +140,16 @@ class Case extends JPanel implements MouseListener {
     /**
      * Set the value of clicked to false and repaint the component.
      */
-    public void newParty() {
+    public void newGameCase() {
         clicked = false;
         repaint();
     }
 
+    /**
+     * Event
+     *
+     * @param e Event
+     */
     @Override
     public void mouseClicked(MouseEvent e) {
 
@@ -144,6 +157,8 @@ class Case extends JPanel implements MouseListener {
 
     /**
      * Handle mouse
+     *
+     * @param e event
      */
     @Override
     public void mousePressed(MouseEvent e) {
@@ -193,16 +208,31 @@ class Case extends JPanel implements MouseListener {
         }
     }
 
+    /**
+     * Event
+     *
+     * @param e Event
+     */
     @Override
     public void mouseReleased(MouseEvent e) {
 
     }
 
+    /**
+     * Event
+     *
+     * @param e Event
+     */
     @Override
     public void mouseEntered(MouseEvent e) {
 
     }
 
+    /**
+     * Event
+     *
+     * @param e Event
+     */
     @Override
     public void mouseExited(MouseEvent e) {
 
@@ -220,11 +250,19 @@ class Case extends JPanel implements MouseListener {
 
     /**
      * Return if the case was clicked.
+     *
+     * @return Get the information that the case was clicked
      */
     public boolean getClicked() {
         return clicked;
     }
 
+    /**
+     * Set the fact that the case was clicked, by which player and what the case contains
+     *
+     * @param value    Integer of what the case contains (between -1 and 9)
+     * @param playerId Integer of the Id of the player who clicked.
+     */
     synchronized public void setClickedTrueAndValueAndPlayerId(int value, int playerId) {
         clicked = true;
         this.value = value;

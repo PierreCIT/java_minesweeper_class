@@ -5,6 +5,9 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+/**
+ * Class that defines the GUI of the server.
+ */
 public class GUIServer extends JPanel implements ActionListener {
     private ServeurDemineur main;
     private JButton startB; // Button to use to start the server
@@ -39,10 +42,20 @@ public class GUIServer extends JPanel implements ActionListener {
         this.add(dialog, BorderLayout.CENTER);
     }
 
+    /**
+     * Add a message to the TextArea of the GUI
+     *
+     * @param newMsg String, message to add to the GUI
+     */
     public void addDialogText(String newMsg) {
         dialog.append(newMsg + "\n");
     }
 
+    /**
+     * Event of a click
+     *
+     * @param e Event
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == startB) {
@@ -68,6 +81,11 @@ public class GUIServer extends JPanel implements ActionListener {
         }
     }
 
+    /**
+     * Manage the level selection  of the GUI
+     *
+     * @param selectedItem The item selected in the ComboBox
+     */
     private void handleLevelSelection(String selectedItem) {
         if (!main.isGameStarted()) { //Cannot change game level if game is started
             switch (selectedItem) {
