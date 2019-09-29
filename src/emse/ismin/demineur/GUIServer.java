@@ -33,7 +33,7 @@ public class GUIServer extends JPanel implements ActionListener {
         southButtonsP.add(listLevels);
         southButtonsP.add(startB);
         southButtonsP.add(closeServerB);
-        this.add(new JLabel("MinesWeeper server - 2019"), BorderLayout.NORTH);
+        this.add(new JLabel("MinesWeeper server - 2019", SwingConstants.CENTER), BorderLayout.NORTH);
         this.add(southButtonsP, BorderLayout.SOUTH);
 
         //Dialog / log data of server
