@@ -26,9 +26,17 @@ In local just start clicking a case and the game will start.
 If you want to restart at the same level of difficulty just click the `Restart` button.
 If you want to change the level of difficulty go to the `Game` menu and then click on `New Game` and then select the level of difficulty you want to start a game at.
 
+#### Score
+The scores of all games will be saved in a `Scores.dat` file which will contain the date of the game and the score.
+The score represent the time it took you to finish the game. If you finish the game by exploding it will be specified.
+
 ### Online
 In online mode the server decide when to start the game and at which difficulty every client must play. This is done by selecting the level of difficulty in the 'dropdown' menu. Start/End the game by clicking the `Start`/`End Game` button.
 It is impossible to change the level of difficulty while in game.
 You can close the server (and all connections to it) by clicking the `Close server` button.
 A player cannot join a party while a game is in progress.
 **You can't play alone on the online version of the game.**
+
+#### Score
+The scores of all games will be saved in a `ScoresOnline.dat` file which will contain the date of the game and the score of every player that participated in the game, even if they disconnected (during the game) but in this case it will be specified.
+The score represent the time it took you to finish the game. If you finish the game by exploding it will be specified.
