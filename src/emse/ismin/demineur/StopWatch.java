@@ -4,12 +4,16 @@ import javax.swing.*;
 import java.awt.*;
 import java.text.AttributedCharacterIterator;
 
-public class Compteur extends JPanel implements Runnable {
+/**
+ * A class that will create a timer that will be in the GUI.
+ * This timer is the score when playing in local mode.
+ */
+public class StopWatch extends JPanel implements Runnable {
     private Thread processScore; //Thread associated to the class.
     private int score = 0;
 
 
-    Compteur() {
+    StopWatch() {
         setPreferredSize(new Dimension(50, 25)); //Size of the case
     }
 

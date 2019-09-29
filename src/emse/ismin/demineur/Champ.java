@@ -1,13 +1,13 @@
 package emse.ismin.demineur;
 
+import javax.swing.*;
+import java.awt.*;
 import java.util.Random;
 
 
 /**
- * @author Pierre
- * Class which will create the field of the deminor
+ * Class which will create the field of the MinesWeeper
  */
-
 public class Champ {
     private static final int DIMEASY = 5;
     private static final int DIMMEDIUM = 20;
@@ -21,6 +21,9 @@ public class Champ {
     private int DimY;
     private Random alea = new Random();
     private int nbMines = 0;
+    private int dimXCustom = 5;
+    private int dimYCustom = 5;
+
 
     /**
      * Default constructor that will initialize a game in the EASY mode
@@ -60,8 +63,7 @@ public class Champ {
     public void createChamp(int DIM1, int DIM2) {
         if (level == Level.CUSTOM) {
             this.mines = new boolean[DIM1][DIM2];
-            nbMines = (DIM1 + DIM2) / 10;
-            placesMines(nbMines);
+            placesMines(nbMinesForLevel());
             DimX = DIM1;
             DimY = DIM2;
         } else if (level == Level.EASY) {
@@ -82,39 +84,118 @@ public class Champ {
         }
     }
 
-    private int nbMinesForLevel(){
-        if(level==Level.EASY){
-            nbMines=NBMINESEASY;
+
+    /**
+     * Determines the number of mines to put in the field regarding the level of difficulty
+     *
+     * @return Integer representing the number of mine to put
+     */
+    private int nbMinesForLevel() {
+        if (level == Level.EASY) {
+            nbMines = NBMINESEASY;
             return nbMines;
-        }else if(level==Level.MEDIUM){
+        } else if (level == Level.MEDIUM) {
             nbMines = NBMINESMEDIUM;
             return nbMines;
-        }else{
-            nbMines=NBMINESHARD;
+        } else if (level == Level.CUSTOM) {
+            nbMines = (dimXCustom * dimYCustom) / 10;
+            ;
             return nbMines;
+        } else if (level == Level.HARD) {
+            nbMines = NBMINESHARD;
+            return nbMines;
+        } else {
+            System.out.println("Error number of mines for an unknown type of level requested.");
+            return 5;
         }
     }
 
-    public int getNbMines(){
+    /**
+     * Get the number of mines
+     *
+     * @return Integer of the number of mines
+     */
+    public int getNbMines() {
         return nbMines;
     }
 
-    public void newParty(Level level){
-        if(level==this.level){
-            placesMines(nbMinesForLevel());
+    public void newGame(Level level) {
+        if (level == this.level) {
+            placesMines(nbMinesForLevel()); // We just have to place new mines and remove previous ones
             this.print();
-        }else{
+        } else {
             System.out.println("");
-            this.level=level;
-            createChamp(0,0);
-            placesMines(nbMinesForLevel());
+            this.level = level;
+            if (this.level == Level.CUSTOM) {
+                getDimsOptionPanel();
+                createChamp(dimXCustom, dimYCustom);
+            } else {
+                createChamp(0, 0);
+            }
             this.print();
         }
     }
+
     /**
-     * @param x
-     * @param y
-     * @return Number of mines surrounfing the position given by x and y
+     * Create a new custom game when playing online
+     *
+     * @param level      Level, the level of the game
+     * @param dimXServer Integer, the dimension of the X axis
+     * @param dimYServer Integer, the dimension of the Y axis
+     */
+    public void newGame(Level level, int dimXServer, int dimYServer) {
+        dimXCustom = dimXServer;
+        dimYCustom = dimYServer;
+        this.level = level;
+        if (level == Level.CUSTOM) { //This function sould only be called in the case of a Custom level
+            createChamp(dimXServer, dimYServer);
+        } else { //Then we should apply the usual newGame creation
+            createChamp(0, 0);
+        }
+        this.print();
+    }
+
+    /**
+     * Option panel that will get the customs dimensions of the game and will create champ with those parameters
+     */
+    public void getDimsOptionPanel() {
+        JPanel panelOptionDims = new JPanel();
+        panelOptionDims.setLayout(new BorderLayout());
+        JPanel northPanel = new JPanel();
+        JPanel southPanel = new JPanel();
+        northPanel.add(new JLabel("Enter X axis dims [3:100] : "));
+        JTextField XAxis = new JTextField(10);
+        northPanel.add(XAxis);
+        southPanel.add(new JLabel("Enter Y axis dims [3:100] : "));
+        JTextField YAxis = new JTextField(10);
+        southPanel.add(YAxis);
+        panelOptionDims.add(northPanel, BorderLayout.NORTH);
+        panelOptionDims.add(southPanel, BorderLayout.SOUTH);
+
+        int result = JOptionPane.showConfirmDialog(null, panelOptionDims, "Enter custom dimensions",
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        if (result == JOptionPane.OK_OPTION) {
+            dimXCustom = Integer.parseInt(XAxis.getText());
+            dimYCustom = Integer.parseInt(YAxis.getText());
+            if (dimXCustom > 100 || dimXCustom < 3) {
+                dimXCustom = 3;
+            }
+            if (dimYCustom > 100 || dimYCustom < 3) {
+                dimYCustom = 3;
+            }
+        } else { //Set a default size if the player cancel
+            dimXCustom = DIMEASY;
+            dimYCustom = DIMEASY;
+        }
+
+    }
+
+    /**
+     * Return the number of mines surrounding a position (excluding the position itself)
+     *
+     * @param x Integer of the X position of the case
+     * @param y Integer of the Y position of the case
+     * @return Number of mines surrounding the position given by x and y
      */
     public int numberMinesSurrounding(int x, int y) {
         int nbMines = 0;
@@ -137,6 +218,8 @@ public class Champ {
 
     /**
      * Select the position of a mine randomly
+     *
+     * @param nbMines Integer number of mines to place in the field
      */
     public void placesMines(int nbMines) {
         for (int x = 0; x < this.mines.length; x++) {
@@ -185,21 +268,37 @@ public class Champ {
 
     }
 
+    /**
+     * Return a boolean answering the question is there a mine.
+     *
+     * @param x Integer x position of the mine
+     * @param y Integer y position of the mine
+     * @return Boolean true if there is a mine false otherwise.
+     */
     public boolean isMine(int x, int y) {
         return mines[x][y];
     }
 
-    public int getDimX(){
+    /**
+     * Get the X dimension of the mine field
+     *
+     * @return Integer
+     */
+    public int getDimX() {
         return DimX;
     }
 
-    public int getDimY(){
+    /**
+     * Get the Y dimension of the mine field
+     *
+     * @return Integer
+     */
+    public int getDimY() {
         return DimY;
     }
+
     /**
-     * Convert the mines position to an String with x as the mine position
-     *
-     * @return The string containing the mines field
+     * Print the mine position in the console.
      */
     public void print() {
         for (int x = 0; x < this.mines.length; x++) {
@@ -215,4 +314,21 @@ public class Champ {
         System.out.print("\n");
     }
 
+    /**
+     * Get the infomation of the X axis send by the server or local user if in local
+     *
+     * @return Integer of the X axis
+     */
+    public int getDimXCustom() {
+        return dimXCustom;
+    }
+
+    /**
+     * Get the infomation of the Y axis send by the server or local user if in local
+     *
+     * @return Integer of the Y axis
+     */
+    public int getDimYCustom() {
+        return dimYCustom;
+    }
 }
