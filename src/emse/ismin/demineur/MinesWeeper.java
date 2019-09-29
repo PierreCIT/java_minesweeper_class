@@ -8,10 +8,10 @@ import java.net.UnknownHostException;
 /**
  * Class that will handle local and online game of the MinesWeeper
  */
-public class Demineur extends JFrame implements Runnable {
+public class MinesWeeper extends JFrame implements Runnable {
     public final static String FILENAME = "score.dat";
     public Level level = Level.EASY;
-    private Champ champMines = new Champ(level);
+    private Field fieldMines = new Field(level);
     private boolean started = false;
     private GUI panel;
     private boolean lost;
@@ -34,11 +34,11 @@ public class Demineur extends JFrame implements Runnable {
     private int playerId = 0;
 
     /**
-     * Constructor of the 'Demineur' (MinesWeeper) which will initialize the game
+     * Constructor of the MinesWeeper which will initialize the game
      */
-    public Demineur() {
+    public MinesWeeper() {
         super("MinesWeeper connected");
-        champMines.print();
+        fieldMines.print();
         panel = new GUI(this);
         setContentPane(panel);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -61,14 +61,14 @@ public class Demineur extends JFrame implements Runnable {
      */
     public static void main(String[] args) {
         System.out.println("Welcome in the MineWeeper.");
-        new Demineur();
+        new MinesWeeper();
     }
 
     /**
      * @return The private variable containing the
      */
-    public Champ getChamp() {
-        return champMines;
+    public Field getChamp() {
+        return fieldMines;
     }
 
     /**

@@ -18,7 +18,7 @@ class Case extends JPanel implements MouseListener {
     private boolean clicked = false;
     private int x;
     private int y;
-    private Demineur demin;
+    private MinesWeeper demin;
     private int value = 0; //Only used when playing online. It will contain the value to show or mines if -1
     private int playerIdClicked = 0; //Only used when playing online. It will contain the id of the player who clicked
 
@@ -34,7 +34,7 @@ class Case extends JPanel implements MouseListener {
     private final static int BLACK = 0x333333;//9
 
 
-    public Case(int x, int y, Demineur demin) {
+    public Case(int x, int y, MinesWeeper demin) {
         this.x = x;
         this.y = y;
         this.demin = demin;

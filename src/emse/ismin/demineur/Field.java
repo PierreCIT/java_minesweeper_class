@@ -8,7 +8,7 @@ import java.util.Random;
 /**
  * Class which will create the field of the MinesWeeper
  */
-public class Champ {
+public class Field {
     private static final int DIMEASY = 5;
     private static final int DIMMEDIUM = 20;
     private static final int DIMHARD = 30;
@@ -28,7 +28,7 @@ public class Champ {
     /**
      * Default constructor that will initialize a game in the EASY mode
      */
-    public Champ() {
+    public Field() {
         this.level = Level.EASY;
         createChamp(DIMEASY, DIMEASY);
     }
@@ -38,7 +38,7 @@ public class Champ {
      *
      * @param level Enum level that can be EASY, MEDIUM, HARD
      */
-    public Champ(Level level) {
+    public Field(Level level) {
         this.level = level;
         createChamp(0, 0);
     }
@@ -49,7 +49,7 @@ public class Champ {
      * @param DIM1 X dimension
      * @param DIM2 Y dimension
      */
-    public Champ(int DIM1, int DIM2) {
+    public Field(int DIM1, int DIM2) {
         this.level = Level.CUSTOM;
         createChamp(DIM1, DIM2);
     }

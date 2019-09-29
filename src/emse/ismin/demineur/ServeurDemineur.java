@@ -23,7 +23,7 @@ public class ServeurDemineur extends JFrame implements Runnable {
     //Game Variables
     private boolean gameStarted = false;
     private Level level = Level.EASY;
-    private Champ mineField = new Champ(level); //Start a new mine field with easy parameter by default
+    private Field mineField = new Field(level); //Start a new mine field with easy parameter by default
     private boolean[][] caseClicked; //Array that will represent the mine field and which field was already clicked
     //List that will contain all the information of all the players
     private List<Player> playersList = new ArrayList<Player>();
@@ -126,7 +126,7 @@ public class ServeurDemineur extends JFrame implements Runnable {
      *
      * @return Champ: The current mines filed object
      */
-    public Champ getMineField() {
+    public Field getMineField() {
         return mineField;
     }
 

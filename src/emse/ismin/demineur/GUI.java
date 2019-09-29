@@ -10,7 +10,7 @@ import java.awt.event.KeyEvent;
  * Class that contains the MineWeeper interface. It handles online and local game mode.
  */
 public class GUI extends JPanel implements ActionListener {
-    private Demineur main;
+    private MinesWeeper main;
     private JButton butQuit;
     private JButton butRestart;
     private JLabel labWelcom;
@@ -43,7 +43,7 @@ public class GUI extends JPanel implements ActionListener {
      *
      * @param main Main of Demineur
      */
-    public GUI(Demineur main) {
+    public GUI(MinesWeeper main) {
         this.main = main;
         //Compteur
         stopWatch = new StopWatch();
