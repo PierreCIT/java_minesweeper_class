@@ -169,14 +169,15 @@ class Case extends JPanel implements MouseListener {
                 }
                 clicked = true;
                 if (!demin.isStarted()) {
-                    demin.getGui().getCompteur().startCpt();
+                    demin.getGui().getStopWatch().startCpt();
                     demin.setStarted(true);
                 }
                 repaint(); //Force the call to paintComponents (default behavior)
 
                 if (demin.getChamp().isMine(x, y)) {
                     demin.setLost(true);
-                    demin.getGui().getCompteur().stopCpt();
+                    demin.getGui().getStopWatch().stopCpt();
+                    demin.saveScore(demin.getGui().getStopWatch().getScore());
                     int rep = JOptionPane.showConfirmDialog(null, "BOOM ! GAME OVER ! Try " +
                                     "again ! ", "Game Over",
                             JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE);
@@ -190,15 +191,15 @@ class Case extends JPanel implements MouseListener {
                     }
                 }
                 if (demin.isWin()) {
-                    demin.getGui().getCompteur().stopCpt();
+                    demin.getGui().getStopWatch().stopCpt();
                     int rep = JOptionPane.showConfirmDialog(null, "Congratulations ! You WIN " +
-                                    "!!! \nYour score is " + demin.getGui().getCompteur().getScore() +
+                                    "!!! \nYour score is " + demin.getGui().getStopWatch().getScore() +
                                     "\nWould you like to restart ?", "Congratulations",
                             JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
                     if (rep == JOptionPane.YES_OPTION) {
                         demin.getGui().newGame(demin.level);
                     }
-                    demin.saveScore();
+                    demin.saveScore(demin.getGui().getStopWatch().getScore());
                 }
             }
         } else { //Behavior in online game mode.

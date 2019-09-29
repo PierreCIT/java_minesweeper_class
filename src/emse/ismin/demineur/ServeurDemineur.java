@@ -18,6 +18,7 @@ public class ServeurDemineur extends JFrame implements Runnable {
     private ServerSocket manageSock;
     private static final int serverPort = 10000; //Default server port
     private int playerIds = 0; //To id players by a number
+    private WriteScoreInFile fileScoreWriter = new WriteScoreInFile();
 
     //Game Variables
     private boolean gameStarted = false;
@@ -263,6 +264,7 @@ public class ServeurDemineur extends JFrame implements Runnable {
                 }
             }
         }
+        fileScoreWriter.writeOnlineScoreInScoreOnlineFile(playersList);
         //TODO: Saves score in a file
         deleteDisconnectedPlayers();
     }
