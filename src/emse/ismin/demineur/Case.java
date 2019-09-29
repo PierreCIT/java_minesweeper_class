@@ -55,7 +55,7 @@ class Case extends JPanel implements MouseListener {
             gc.fillRect(1, 1, getWidth(), getHeight());
         } else {
             if (!minesWeeperMain.isOnlineGame()) { //Behavior when in local mode
-                if (minesWeeperMain.getChamp().isMine(x, y)) {
+                if (minesWeeperMain.getField().isMine(x, y)) {
                     try {
                         BufferedImage image = ImageIO.read(new File("img/bomb.png"));
                         gc.drawImage(image, 3, 3, getWidth() - 3, getHeight() - 3, this);
@@ -63,11 +63,11 @@ class Case extends JPanel implements MouseListener {
                         e.printStackTrace();
                     }
                 } else {
-                    gc.setColor(new Color(handleColor(Integer.parseInt(minesWeeperMain.getChamp().getValueField(x, y)))));
+                    gc.setColor(new Color(handleColor(Integer.parseInt(minesWeeperMain.getField().getValueField(x, y)))));
                     gc.fillRect(0, 0, getWidth(), getHeight());
                     gc.setColor(new Color(0, 0, 0));
-                    if (Integer.parseInt(minesWeeperMain.getChamp().getValueField(x, y)) != 0) {
-                        gc.drawString(minesWeeperMain.getChamp().getValueField(x, y), getHeight() / 2, getWidth() / 2);
+                    if (Integer.parseInt(minesWeeperMain.getField().getValueField(x, y)) != 0) {
+                        gc.drawString(minesWeeperMain.getField().getValueField(x, y), getHeight() / 2, getWidth() / 2);
                     }
                 }
             } else { //Behavior when in online mode.
@@ -164,7 +164,7 @@ class Case extends JPanel implements MouseListener {
                 }
                 repaint(); //Force the call to paintComponents (default behavior)
 
-                if (minesWeeperMain.getChamp().isMine(x, y)) {
+                if (minesWeeperMain.getField().isMine(x, y)) {
                     minesWeeperMain.setLost(true);
                     minesWeeperMain.getGui().getStopWatch().stopCpt();
                     minesWeeperMain.saveScore(minesWeeperMain.getGui().getStopWatch().getScore());
@@ -172,11 +172,12 @@ class Case extends JPanel implements MouseListener {
                                     "again ! ", "Game Over",
                             JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE);
                     if (rep == JOptionPane.YES_OPTION) {
+                        minesWeeperMain.getField().newGame(minesWeeperMain.level);
                         minesWeeperMain.getGui().newGame(minesWeeperMain.level);
                     }
                 } else {
                     //If the case clicked is empty without close bombs then we call the function to show all adjacentValues
-                    if (minesWeeperMain.getChamp().getValueField(x, y).equals("0")) {
+                    if (minesWeeperMain.getField().getValueField(x, y).equals("0")) {
                         minesWeeperMain.getGui().adjacentSameValue(x, y);
                     }
                 }

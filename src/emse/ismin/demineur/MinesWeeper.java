@@ -56,7 +56,7 @@ public class MinesWeeper extends JFrame implements Runnable {
     /**
      * @return The private variable containing the
      */
-    Field getChamp() {
+    Field getField() {
         return fieldMines;
     }
 
@@ -142,7 +142,7 @@ public class MinesWeeper extends JFrame implements Runnable {
      * @return true if the game is won, false otherwise.
      */
     boolean isWin() {
-        return getNbCaseClicked() + getChamp().getNbMines() == getChamp().getDimY() * getChamp().getDimX();
+        return getNbCaseClicked() + getField().getNbMines() == getField().getDimY() * getField().getDimX();
     }
 
     /**

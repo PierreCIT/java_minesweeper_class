@@ -181,7 +181,7 @@ public class GUI extends JPanel implements ActionListener {
                 main.disconnect();
             quit();
         } else if (e.getSource() == butRestart) {
-            main.getChamp().newGame(main.level);
+            main.getField().newGame(main.level);
             newGame();
         } else if (e.getSource() == mQuitter) {
             if (main.isOnlineGame())
@@ -190,16 +190,16 @@ public class GUI extends JPanel implements ActionListener {
         } else if (e.getSource() == mAbout) {
             about();
         } else if (e.getSource() == mEasy) {
-            main.getChamp().newGame(Level.EASY);
+            main.getField().newGame(Level.EASY);
             newGame(Level.EASY);
         } else if (e.getSource() == mMedium) {
-            main.getChamp().newGame(Level.MEDIUM);
+            main.getField().newGame(Level.MEDIUM);
             newGame(Level.MEDIUM);
         } else if (e.getSource() == mHard) {
-            main.getChamp().newGame(Level.HARD);
+            main.getField().newGame(Level.HARD);
             newGame(Level.HARD);
         } else if (e.getSource() == mCustom) {
-            main.getChamp().newGame(Level.CUSTOM);
+            main.getField().newGame(Level.CUSTOM);
             newGame(Level.CUSTOM);
         } else if (e.getSource() == coDiscoButton)
             if (!main.connected) {
@@ -212,12 +212,12 @@ public class GUI extends JPanel implements ActionListener {
     }
 
     private void placeCases() {
-        gridPanel.setLayout(new GridLayout(main.getChamp().getDimX(), main.getChamp().getDimY()));
+        gridPanel.setLayout(new GridLayout(main.getField().getDimX(), main.getField().getDimY()));
         add(gridPanel, BorderLayout.CENTER);
 
-        tabCase = new Case[main.getChamp().getDimX()][main.getChamp().getDimY()];
-        for (int x = 0; x < main.getChamp().getDimX(); x++) {
-            for (int y = 0; y < main.getChamp().getDimY(); y++) {
+        tabCase = new Case[main.getField().getDimX()][main.getField().getDimY()];
+        for (int x = 0; x < main.getField().getDimX(); x++) {
+            for (int y = 0; y < main.getField().getDimY(); y++) {
                 tabCase[x][y] = new Case(x, y, main);
                 gridPanel.add(tabCase[x][y]);
             }
@@ -228,8 +228,8 @@ public class GUI extends JPanel implements ActionListener {
      * Asked to all cases to start to reinitialize. (The mine position is not changed here)
      */
     private void newGame() {
-        for (int x = 0; x < main.getChamp().getDimX(); x++) {
-            for (int y = 0; y < main.getChamp().getDimY(); y++) {
+        for (int x = 0; x < main.getField().getDimX(); x++) {
+            for (int y = 0; y < main.getField().getDimY(); y++) {
                 tabCase[x][y].newGameCase();
             }
         }
@@ -266,9 +266,9 @@ public class GUI extends JPanel implements ActionListener {
         gridPanel.removeAll();
         if (main.isOnlineGame()) {
             if (level != Level.CUSTOM) {
-                main.getChamp().newGame(level);
+                main.getField().newGame(level);
             } else {
-                main.getChamp().newGame(level, main.getDimXCustom(), main.getDimYCustom());
+                main.getField().newGame(level, main.getDimXCustom(), main.getDimYCustom());
             }
         }
         placeCases();
@@ -291,16 +291,16 @@ public class GUI extends JPanel implements ActionListener {
      */
     void adjacentSameValue(int x, int y) {
         int borneInfX = x == 0 ? 0 : -1;
-        int borneSupX = x == main.getChamp().getDimX() - 1 ? 0 : 1;
+        int borneSupX = x == main.getField().getDimX() - 1 ? 0 : 1;
         int borneInfY = y == 0 ? 0 : -1;
-        int borneSupY = y == main.getChamp().getDimY() - 1 ? 0 : 1;
+        int borneSupY = y == main.getField().getDimY() - 1 ? 0 : 1;
 
         for (int i = borneInfX; i <= borneSupX; i++) {
             for (int k = borneInfY; k <= borneSupY; k++) {
                 if (!(i == 0 && k == 0)) { //We don't count the mine itself
                     if (!tabCase[x + i][y + k].getClicked()) { //If the case is not already clicked
                         tabCase[x + i][y + k].setClickedTrue();
-                        if (main.getChamp().numberMinesSurrounding(x + i, y + k) == 0) {
+                        if (main.getField().numberMinesSurrounding(x + i, y + k) == 0) {
                             adjacentSameValue(x + i, y + k);
                         }
                     }
