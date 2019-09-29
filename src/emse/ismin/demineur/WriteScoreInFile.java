@@ -14,17 +14,16 @@ import java.util.List;
  * @author Pierre
  */
 public class WriteScoreInFile {
-    private final static String dashLine = "----------------------------";
+    private final static String dashLine = "---------------------------------------";
 
     WriteScoreInFile() {
-
     }
 
-    public void writeInScoreFile(List<Player> playerList) {
+    public void writeOnlineScoreInScoreOnlineFile(List<Player> playerList) {
         File dir = new File("."); //Current directory
         String loc = null;
         try {
-            loc = dir.getCanonicalPath() + File.separator + "Scores.dat";
+            loc = dir.getCanonicalPath() + File.separator + "ScoresOnline.dat";
             FileWriter fstream = new FileWriter(loc, true);
             BufferedWriter out = new BufferedWriter(fstream);
             DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
@@ -34,9 +33,9 @@ public class WriteScoreInFile {
             out.newLine();
             out.write("Game of the : " + dtf.format(now));
             out.newLine();
-            for(Player player: playerList){
-                if(player.isInGame()){
-                    String msg = "PlayerId: "+player.getPlayerId() +", Nickname: "+ player.getNickname() + ", Score: " +
+            for (Player player : playerList) {
+                if (player.isInGame()) {
+                    String msg = "PlayerId: " + player.getPlayerId() + ", Nickname: " + player.getNickname() + ", Score: " +
                             player.getScore();
                     if (player.isExploded()) {
                         msg += ", Exploded";
@@ -52,14 +51,41 @@ public class WriteScoreInFile {
             out.write(dashLine);
             out.newLine();
             out.newLine();
-
-
             //close buffer writer
             out.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
 
+    public void writeLocalScoreInScoreFile(int score, boolean exploded) {
+        File dir = new File("."); //Current directory
+        String loc = null;
+        try {
+            loc = dir.getCanonicalPath() + File.separator + "Scores.dat";
+            FileWriter fstream = new FileWriter(loc, true);
+            BufferedWriter out = new BufferedWriter(fstream);
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+            LocalDateTime now = LocalDateTime.now();
 
+            out.write(dashLine);
+            out.newLine();
+            out.write("Game of the : " + dtf.format(now));
+            out.newLine();
+            String msg = " Score: " + score;
+            if (exploded) {
+                msg += ", Exploded";
+            }
+            out.write(msg);
+            out.newLine();
+            out.newLine();
+            out.write(dashLine);
+            out.newLine();
+            out.newLine();
+            //close buffer writer
+            out.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -4,22 +4,19 @@ import javax.swing.*;
 import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 /**
  * Class that will handle local and online game of the MinesWeeper
  */
 public class Demineur extends JFrame implements Runnable {
     public final static String FILENAME = "score.dat";
-    public int score = 20;
     public Level level = Level.EASY;
     private Champ champMines = new Champ(level);
     private boolean started = false;
     private GUI panel;
     private boolean lost;
     private int nbCaseClicked = 0;
+    private WriteScoreInFile writeLocalScoreInFile = new WriteScoreInFile();
     //Connection
     public String ipDefault = "127.0.0.1";
     public int portDefault = 10000;
@@ -193,14 +190,8 @@ public class Demineur extends JFrame implements Runnable {
     /**
      * Function that will save the game score into a file.
      */
-    public void saveScore() {
-        //TODO: Finish saving score in a file.
-        Path path = Paths.get(FILENAME);
-
-        if (!Files.exists(path)) {
-            for (int i = 0; i < Level.values().length; i++) {
-            }
-        }
+    public void saveScore(int score) {
+        writeLocalScoreInFile.writeLocalScoreInScoreFile(score, isLost());
     }
 
     /**
@@ -318,12 +309,12 @@ public class Demineur extends JFrame implements Runnable {
                 break;
             case "STARTGAME":
                 gameStarted = true;
-                panel.getCompteur().startCpt();
+                panel.getStopWatch().startCpt();
                 panel.setNewGameButtonState(false);
                 break;
             case "ENDGAME":
                 gameStarted = false;
-                panel.getCompteur().stopCpt();
+                panel.getStopWatch().stopCpt();
                 panel.setNewGameButtonState(true);
                 panel.addMsgGui("Game ended by the server.");
                 noPlayerId();
@@ -332,7 +323,7 @@ public class Demineur extends JFrame implements Runnable {
                 gameStarted = false;
                 connected = false;
                 onlineGame = false;
-                panel.getCompteur().stopCpt();
+                panel.getStopWatch().stopCpt();
                 panel.addMsgGui("The server has closed.");
                 panel.setNewGameButtonState(true);
                 panel.coDecoButtonChangeText();
@@ -351,11 +342,11 @@ public class Demineur extends JFrame implements Runnable {
                 break;
             case "LOST":
                 gameStarted = false;
-                panel.getCompteur().stopCpt();
+                panel.getStopWatch().stopCpt();
                 lostExploded();
                 break;
             case "FINISHGAME":
-                panel.getCompteur().stopCpt();
+                panel.getStopWatch().stopCpt();
                 gameStarted = false;
                 finishGamePopUp();
                 break;

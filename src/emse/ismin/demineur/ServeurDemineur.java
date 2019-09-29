@@ -264,7 +264,7 @@ public class ServeurDemineur extends JFrame implements Runnable {
                 }
             }
         }
-        fileScoreWriter.writeInScoreFile(playersList);
+        fileScoreWriter.writeOnlineScoreInScoreOnlineFile(playersList);
         //TODO: Saves score in a file
         deleteDisconnectedPlayers();
     }

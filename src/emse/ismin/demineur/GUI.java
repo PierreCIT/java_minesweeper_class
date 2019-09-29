@@ -28,7 +28,7 @@ public class GUI extends JPanel implements ActionListener {
     private JMenuItem mCustom;
 
     private Case[][] tabCase; //Array that will store the cases in the gridLayer
-    private Compteur compteur;
+    private StopWatch stopWatch;
 
     //Connection features
     private TextField ipTF; //IP server to connect to
@@ -46,7 +46,7 @@ public class GUI extends JPanel implements ActionListener {
     public GUI(Demineur main) {
         this.main = main;
         //Compteur
-        compteur = new Compteur();
+        stopWatch = new StopWatch();
 
         setLayout(new BorderLayout());
         northPanel = new JPanel();
@@ -57,7 +57,7 @@ public class GUI extends JPanel implements ActionListener {
         labelLevel = new JLabel("Level : " + main.level, SwingConstants.CENTER);
         northPanel.setLayout(new BorderLayout());
         northPanelLabels.add(labWelcom);
-        northPanelLabels.add(compteur); //Adding compteur to northPanel
+        northPanelLabels.add(stopWatch); //Adding compteur to northPanel
         northPanelLabels.add(labelLevel);
         northPanel.add(northPanelLabels, BorderLayout.NORTH);
         labWelcom.setFont(new Font("Papyrus", Font.ITALIC, 12));
@@ -213,7 +213,7 @@ public class GUI extends JPanel implements ActionListener {
                 main.connectServer(ipTF.getText(), Integer.parseInt(portTF.getText()), nicknameTF.getText());
             } else {
                 main.disconnect();
-                compteur.stopCpt();
+                stopWatch.stopCpt();
                 playerIdUpdate(0);
             }
     }
@@ -240,7 +240,7 @@ public class GUI extends JPanel implements ActionListener {
                 tabCase[x][y].newGameCase();
             }
         }
-        compteur.stopCpt();
+        stopWatch.stopCpt();
         main.newGame();
     }
 
@@ -280,12 +280,12 @@ public class GUI extends JPanel implements ActionListener {
         }
         placeCases();
         main.pack();
-        compteur.stopCpt();
+        stopWatch.stopCpt();
         main.newGame(level);
     }
 
-    public Compteur getCompteur() {
-        return compteur;
+    public StopWatch getStopWatch() {
+        return stopWatch;
     }
 
     /**
