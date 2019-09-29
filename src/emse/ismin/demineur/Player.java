@@ -1,5 +1,7 @@
 package emse.ismin.demineur;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.util.Comparator;
 
 /**
@@ -13,6 +15,15 @@ public class Player {
     private boolean exploded = false;
     private boolean inGame = false; // Can make the distinction between player who joined at the begining or not
     private String nickname;
+    private DataOutputStream out; //Output stream to the client
+    private DataInputStream in; //Input stream from the client
+
+    Player(String name, int playerId, DataInputStream in, DataOutputStream out) {
+        nickname = name;
+        this.playerId = playerId;
+        this.in = in;
+        this.out = out;
+    }
 
     Player(String name, int playerId) {
         nickname = name;
@@ -29,7 +40,7 @@ public class Player {
     }
 
     /**
-     * Set the player state as deconnected. We keep its score to print at the end of the game
+     * Set the player state as disconnected. We keep its score to print at the end of the game
      */
     public void disconnected() {
         connected = false;
@@ -117,5 +128,21 @@ public class Player {
      */
     public int getPlayerId() {
         return playerId;
+    }
+
+    /**
+     * Get the output data stream of this player
+     * @return The output data stream to the client
+     */
+    public DataOutputStream getOut() {
+        return out;
+    }
+
+    /**
+     * Get the input data stream of this player
+     * @return The input data stream to the client
+     */
+    public DataInputStream getIn() {
+        return in;
     }
 }
