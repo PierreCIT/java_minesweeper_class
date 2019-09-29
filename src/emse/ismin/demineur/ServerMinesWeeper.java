@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -26,9 +25,9 @@ public class ServerMinesWeeper extends JFrame implements Runnable {
     private Field mineField = new Field(level); //Start a new mine field with easy parameter by default
     private boolean[][] caseClicked; //Array that will represent the mine field and which field was already clicked
     //List that will contain all the information of all the players
-    private List<Player> playersList = new ArrayList<Player>();
+    private List<Player> playersList = new ArrayList<>();
 
-    ServerMinesWeeper() {
+    private ServerMinesWeeper() {
         System.out.print("Server starting ... ");
         //Create GUI
         guiServer = new GUIServer(this);
@@ -57,7 +56,7 @@ public class ServerMinesWeeper extends JFrame implements Runnable {
         new ServerMinesWeeper();
     }
 
-    public void startGame() {
+    void startGame() {
         guiServer.addDialogText("Game Started");
     }
 
@@ -126,7 +125,7 @@ public class ServerMinesWeeper extends JFrame implements Runnable {
      *
      * @return Champ: The current mines filed object
      */
-    public Field getMineField() {
+    Field getMineField() {
         return mineField;
     }
 
@@ -222,13 +221,13 @@ public class ServerMinesWeeper extends JFrame implements Runnable {
      * Compute the ranking for each player and broadcast it. Sends a special command to the winner.
      */
     private void computeScores() {
-        Collections.sort(playersList, new SortByScore());
+        playersList.sort(new SortByScore());
 
         //Is there Ex-Aequo
         int maxScore = playersList.get(0).getScore(); //Since the list is sorted the first player has the maximum score
         int nbMaxValue = 0;
-        for (int i = 0; i < playersList.size(); i++) {
-            if (playersList.get(i).getScore() == maxScore && playersList.get(i).isInGame()) {
+        for (Player value : playersList) {
+            if (value.getScore() == maxScore && value.isInGame()) {
                 nbMaxValue++;
             }
         }
@@ -245,13 +244,13 @@ public class ServerMinesWeeper extends JFrame implements Runnable {
         //Broadcast ranking
         for (Player player : playersList) {
             if (player.isInGame() && player.isConnected()) { //Only broadcast to player who played in the game
-                for (int i = 0; i < playersList.size(); i++) {
-                    String msg = playersList.get(i).getNickname() + " (" + playersList.get(i).getPlayerId() + ") : " +
-                            playersList.get(i).getScore() + ".";
-                    if (playersList.get(i).isExploded()) {
+                for (Player value : playersList) {
+                    String msg = value.getNickname() + " (" + value.getPlayerId() + ") : " +
+                            value.getScore() + ".";
+                    if (value.isExploded()) {
                         msg += " Exploded.";
                     }
-                    if (!playersList.get(i).isConnected()) {
+                    if (!value.isConnected()) {
                         msg += " Disconnected in game.";
                     }
                     try {
@@ -265,7 +264,6 @@ public class ServerMinesWeeper extends JFrame implements Runnable {
             }
         }
         fileScoreWriter.writeOnlineScoreInScoreOnlineFile(playersList);
-        //TODO: Saves score in a file
         deleteDisconnectedPlayers();
     }
 
@@ -322,7 +320,7 @@ public class ServerMinesWeeper extends JFrame implements Runnable {
      *
      * @param msg The message (String) to send
      */
-    public void broadcastMSG(String msg) {
+    void broadcastMSG(String msg) {
         try {
             for (Player player : playersList) {
                 if (player.isConnected()) {
@@ -339,7 +337,7 @@ public class ServerMinesWeeper extends JFrame implements Runnable {
     /**
      * Send a broadcast message to all connected client to say that the game started
      */
-    public void gameStarted() {
+    void gameStarted() {
         try {
             for (Player player : playersList) {
                 if (player.isConnected()) {
@@ -355,7 +353,7 @@ public class ServerMinesWeeper extends JFrame implements Runnable {
     /**
      * Send a broadcast message to all connected client to say that the game ended
      */
-    synchronized public void gameStopped() {
+    synchronized void gameStopped() {
         try {
             gameStarted = false;
             for (Player player : playersList) {
@@ -376,14 +374,14 @@ public class ServerMinesWeeper extends JFrame implements Runnable {
      *
      * @return The state of the game
      */
-    public boolean isGameStarted() {
+    boolean isGameStarted() {
         return gameStarted;
     }
 
     /**
      * Sends a close server message to all clients and then close the server
      */
-    synchronized public void closeServer() {
+    synchronized void closeServer() {
         try {
             for (Player player : playersList) {
                 if (player.isConnected()) {
@@ -404,7 +402,7 @@ public class ServerMinesWeeper extends JFrame implements Runnable {
      *
      * @param state Boolean to put the state of the game to.
      */
-    public void setGameStarted(boolean state) {
+    void setGameStarted(boolean state) {
         gameStarted = state;
     }
 
@@ -413,7 +411,7 @@ public class ServerMinesWeeper extends JFrame implements Runnable {
      *
      * @return The current level of mine field
      */
-    public Level getLevel() {
+    Level getLevel() {
         return level;
     }
 
@@ -422,7 +420,7 @@ public class ServerMinesWeeper extends JFrame implements Runnable {
      *
      * @param level A Level enum
      */
-    public void setLevel(Level level) {
+    void setLevel(Level level) {
         this.level = level;
     }
 
@@ -457,7 +455,7 @@ public class ServerMinesWeeper extends JFrame implements Runnable {
     /**
      * Place new mines according to the level and send the information to the client.
      */
-    synchronized public void newGameServer() {
+    synchronized void newGameServer() {
         try {
             if (level == Level.CUSTOM) {
                 mineField.newGame(level, mineField.getDimXCustom(), mineField.getDimYCustom());
@@ -471,7 +469,7 @@ public class ServerMinesWeeper extends JFrame implements Runnable {
                     player.setInGame(true);
                     player.setScore(0); //Reset player score to 0
                     player.setExploded(false);
-                    player.getOut().writeUTF("LEVEL"); //Send the command
+                    player.getOut().writeUTF(Commands.LEVEL.name()); //Send the command
                     player.getOut().writeUTF(level.name()); //Send the command
                     if (level == Level.CUSTOM) {
                         player.getOut().writeInt(mineField.getDimXCustom());
@@ -486,10 +484,10 @@ public class ServerMinesWeeper extends JFrame implements Runnable {
         }
     }
 
-    public Player getPlayerById(int playerIdToLookFor) {
-        for (int i = 0; i < playersList.size(); i++) {
-            if (playersList.get(i).getPlayerId() == playerIdToLookFor) {
-                return playersList.get(i);
+    private Player getPlayerById(int playerIdToLookFor) {
+        for (Player player : playersList) {
+            if (player.getPlayerId() == playerIdToLookFor) {
+                return player;
             }
         }
         System.out.println("Error : server looking for a playerId that is not in the list of the players.");

@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
 /**
@@ -13,13 +14,9 @@ public class GUI extends JPanel implements ActionListener {
     private MinesWeeper main;
     private JButton butQuit;
     private JButton butRestart;
-    private JLabel labWelcom;
     private JLabel labelLevel;
-    private JPanel northPanelLabels;
-    private JPanel northPanel;
-    private JPanel gridPannel = new JPanel();
+    private JPanel gridPanel = new JPanel();
 
-    private JPanel ButtonSouth;
     private JMenuItem mQuitter;
     private JMenuItem mAbout;
     private JMenuItem mEasy;
@@ -39,28 +36,28 @@ public class GUI extends JPanel implements ActionListener {
     private TextArea msgServer = new TextArea(5, 35); //Text area in which messages from the server will be printed
 
     /**
-     * Create the pannels information inside the frame
+     * Create the panels information inside the frame
      *
-     * @param main Main of Demineur
+     * @param main MinesWeeper class which is the main of MineWeeper's game
      */
-    public GUI(MinesWeeper main) {
+    GUI(MinesWeeper main) {
         this.main = main;
-        //Compteur
+        //StopWatch
         stopWatch = new StopWatch();
 
         setLayout(new BorderLayout());
-        northPanel = new JPanel();
-        northPanelLabels = new JPanel();
+        JPanel northPanel = new JPanel();
+        JPanel northPanelLabels = new JPanel();
 
         //NorthPanel's label
-        labWelcom = new JLabel("Welcome on the connected Minesweeper !");
+        JLabel labWelcome = new JLabel("Welcome on the connected Minesweeper !");
         labelLevel = new JLabel("Level : " + main.level, SwingConstants.CENTER);
         northPanel.setLayout(new BorderLayout());
-        northPanelLabels.add(labWelcom);
-        northPanelLabels.add(stopWatch); //Adding compteur to northPanel
+        northPanelLabels.add(labWelcome);
+        northPanelLabels.add(stopWatch); //Adding stopwatch to northPanel
         northPanelLabels.add(labelLevel);
         northPanel.add(northPanelLabels, BorderLayout.NORTH);
-        labWelcom.setFont(new Font("Papyrus", Font.ITALIC, 12));
+        labWelcome.setFont(new Font("Papyrus", Font.ITALIC, 12));
         labelLevel.setFont(new Font("Papyrus", Font.ITALIC, 12));
 
         //Connection features
@@ -98,19 +95,19 @@ public class GUI extends JPanel implements ActionListener {
         butRestart.setFont(new Font("Papyrus", Font.ITALIC, 12));
 
         //Button at the bottom of the grid
-        //Game state fetaures
-        ButtonSouth = new JPanel();
+        //Game state features
+        JPanel buttonSouth = new JPanel();
         msgServer.setEditable(false);
-        ButtonSouth.add(msgServer);
-        ButtonSouth.add(butRestart);
-        ButtonSouth.add(butQuit);
-        this.add(ButtonSouth, BorderLayout.SOUTH);
+        buttonSouth.add(msgServer);
+        buttonSouth.add(butRestart);
+        buttonSouth.add(butQuit);
+        this.add(buttonSouth, BorderLayout.SOUTH);
 
         //Menu bar
         JMenuBar menuBar = new JMenuBar();
-        //Menu partie
-        JMenu menuPartie = new JMenu("Game");
-        menuBar.add(menuPartie);
+        //Game menu
+        JMenu gameMenu = new JMenu("Game");
+        menuBar.add(gameMenu);
 
         //Button new game
         JMenu mNewParty = new JMenu("New Game");
@@ -127,13 +124,13 @@ public class GUI extends JPanel implements ActionListener {
         mCustom = new JMenuItem("Custom");
         mCustom.addActionListener(this);
         mNewParty.add(mCustom);
-        menuPartie.add(mNewParty);
+        gameMenu.add(mNewParty);
 
 
         //Button quit in the "game" menu
         mQuitter = new JMenuItem("Leave", KeyEvent.VK_Q);
-        mQuitter.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, ActionEvent.CTRL_MASK));
-        menuPartie.add(mQuitter);
+        mQuitter.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.CTRL_MASK));
+        gameMenu.add(mQuitter);
         mQuitter.setToolTipText("The end");
         mQuitter.addActionListener(this);
 
@@ -144,7 +141,7 @@ public class GUI extends JPanel implements ActionListener {
         JMenu mHelp = new JMenu("Help");
         menuBar.add(mHelp);
         mAbout = new JMenuItem("About", KeyEvent.VK_A);
-        mAbout.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, ActionEvent.CTRL_MASK));
+        mAbout.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, InputEvent.CTRL_MASK));
         mAbout.setToolTipText("About the program");
         mHelp.add(mAbout);
         mAbout.addActionListener(this);
@@ -153,16 +150,17 @@ public class GUI extends JPanel implements ActionListener {
 
     /**
      * Get the label that describes the level that must contain "Label : *LEVEL*"
+     *
      * @return A JLabel object
      */
-    public JLabel getLabelLevel() {
+    JLabel getLabelLevel() {
         return labelLevel;
     }
 
     /**
      * Dialog window to quit the game
      */
-    public void quit() {
+    private void quit() {
         int rep = JOptionPane.showConfirmDialog(null, "Are you sure ?", "Close confirmation",
                 JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
         if (rep == JOptionPane.YES_OPTION) {
@@ -171,13 +169,13 @@ public class GUI extends JPanel implements ActionListener {
         }
     }
 
-    public void about() {
+    private void about() {
         JOptionPane.showConfirmDialog(null, "This is awesome !!!",
                 "About", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE);
     }
 
     /**
-     * Listener of events in the pannel
+     * Listener of events in the panel
      *
      * @param e ActionEvent variable
      */
@@ -219,14 +217,14 @@ public class GUI extends JPanel implements ActionListener {
     }
 
     private void placeCases() {
-        gridPannel.setLayout(new GridLayout(main.getChamp().getDimX(), main.getChamp().getDimY()));
-        add(gridPannel, BorderLayout.CENTER);
+        gridPanel.setLayout(new GridLayout(main.getChamp().getDimX(), main.getChamp().getDimY()));
+        add(gridPanel, BorderLayout.CENTER);
 
         tabCase = new Case[main.getChamp().getDimX()][main.getChamp().getDimY()];
         for (int x = 0; x < main.getChamp().getDimX(); x++) {
             for (int y = 0; y < main.getChamp().getDimY(); y++) {
                 tabCase[x][y] = new Case(x, y, main);
-                gridPannel.add(tabCase[x][y]);
+                gridPanel.add(tabCase[x][y]);
             }
         }
     }
@@ -249,13 +247,13 @@ public class GUI extends JPanel implements ActionListener {
      *
      * @param playerId Integer
      */
-    public void playerIdUpdate(int playerId) {
-        if(main.isOnlineGame()) {
+    void playerIdUpdate(int playerId) {
+        if (main.isOnlineGame()) {
             ipTF.setEnabled(false);
             portTF.setEnabled(false);
             nicknameTF.setEnabled(false);
             connectPanel.setBackground(new Color(tabCase[0][0].handleColor(playerId)));
-        }else{
+        } else {
             ipTF.setEnabled(true);
             portTF.setEnabled(true);
             nicknameTF.setEnabled(true);
@@ -269,8 +267,8 @@ public class GUI extends JPanel implements ActionListener {
      *
      * @param level level enum of the new level of the game
      */
-    public void newGame(Level level) {
-        gridPannel.removeAll();
+    void newGame(Level level) {
+        gridPanel.removeAll();
         if (main.isOnlineGame()) {
             if (level != Level.CUSTOM) {
                 main.getChamp().newGame(level);
@@ -284,7 +282,7 @@ public class GUI extends JPanel implements ActionListener {
         main.newGame(level);
     }
 
-    public StopWatch getStopWatch() {
+    StopWatch getStopWatch() {
         return stopWatch;
     }
 
@@ -292,10 +290,11 @@ public class GUI extends JPanel implements ActionListener {
      * Will see if the adjacent cases are of the same value of the one clicked and if it is set
      * these cases to clicked through the method setClickedTrue.
      * The given case at the position x,y is already set to be clicked.
+     *
      * @param x Integer x position of the case to find adjacent values from
      * @param y Integer y position of the case to find adjacent values from
      */
-    public void adjacentSameValue(int x, int y) {
+    void adjacentSameValue(int x, int y) {
         int borneInfX = x == 0 ? 0 : -1;
         int borneSupX = x == main.getChamp().getDimX() - 1 ? 0 : 1;
         int borneInfY = y == 0 ? 0 : -1;
@@ -315,7 +314,7 @@ public class GUI extends JPanel implements ActionListener {
         }
     }
 
-    public void coDecoButtonChangeText() {
+    void coDecoButtonChangeText() {
         if (main.connected)
             coDiscoButton.setText("Disconnect");
         else
@@ -323,7 +322,7 @@ public class GUI extends JPanel implements ActionListener {
         coDiscoButton.repaint();
     }
 
-    public void addMsgGui(String msg) {
+    void addMsgGui(String msg) {
         msgServer.append(msg + "\n");
     }
 
@@ -332,7 +331,7 @@ public class GUI extends JPanel implements ActionListener {
      *
      * @param state A boolean
      */
-    public void setNewGameButtonState(boolean state) {
+    void setNewGameButtonState(boolean state) {
         butRestart.setEnabled(state);
         butRestart.repaint();
     }
@@ -344,7 +343,7 @@ public class GUI extends JPanel implements ActionListener {
      * @param Y Y axis position of the case to get from gridlayout
      * @return The case from the grid layout at the position X, Y
      */
-    public Case getCaseXY(int X, int Y) {
+    Case getCaseXY(int X, int Y) {
         return tabCase[X][Y];
     }
 
@@ -353,7 +352,7 @@ public class GUI extends JPanel implements ActionListener {
      *
      * @return The Restart button from GUI
      */
-    public JButton getButRestart() {
+    JButton getButRestart() {
         return butRestart;
     }
 }

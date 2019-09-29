@@ -12,12 +12,10 @@ public class GUIServer extends JPanel implements ActionListener {
     private ServerMinesWeeper main;
     private JButton startB; // Button to use to start the server
     private JButton closeServerB; // Button to use to close the server and all connections
-    private JPanel southButtonsP;
     private JTextArea dialog = new JTextArea(20, 35); // Dialog/log's server information
-    private String[] levels = {Level.EASY.name(), Level.MEDIUM.name(), Level.HARD.name(), Level.CUSTOM.name()};
-    private JComboBox listLevels;
+    private JComboBox<String> listLevels;
 
-    public GUIServer(ServerMinesWeeper server) {
+    GUIServer(ServerMinesWeeper server) {
         main = server;
         setLayout(new BorderLayout());
 
@@ -28,9 +26,10 @@ public class GUIServer extends JPanel implements ActionListener {
         closeServerB = new JButton("Close Server");
         closeServerB.addActionListener(this);
         //DropDown item list of levels
-        listLevels = new JComboBox(levels);
+        String[] levels = {Level.EASY.name(), Level.MEDIUM.name(), Level.HARD.name(), Level.CUSTOM.name()};
+        listLevels = new JComboBox<>(levels);
         listLevels.addActionListener(this);
-        southButtonsP = new JPanel();
+        JPanel southButtonsP = new JPanel();
         southButtonsP.add(listLevels);
         southButtonsP.add(startB);
         southButtonsP.add(closeServerB);
@@ -47,7 +46,7 @@ public class GUIServer extends JPanel implements ActionListener {
      *
      * @param newMsg String, message to add to the GUI
      */
-    public void addDialogText(String newMsg) {
+    void addDialogText(String newMsg) {
         dialog.append(newMsg + "\n");
     }
 

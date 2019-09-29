@@ -2,7 +2,6 @@ package emse.ismin.demineur;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.util.Comparator;
 
 /**
  * Class that will manage a player, by keeping track of its state (connected or not), its score, its nickname
@@ -13,7 +12,7 @@ public class Player {
     private int playerId; //Unique identifier of a player
     private boolean connected = true;
     private boolean exploded = false;
-    private boolean inGame = false; // Can make the distinction between player who joined at the begining or not
+    private boolean inGame = false; // Can make the distinction between player who joined at the beginning or not
     private String nickname;
     private DataOutputStream out; //Output stream to the client
     private DataInputStream in; //Input stream from the client
@@ -33,16 +32,15 @@ public class Player {
     /**
      * Increase the score of the player by one point (1 more case clicked) and return the new value
      *
-     * @return Integer value of the score after the increase.
      */
-    public int increaseScore() {
-        return score++;
+    void increaseScore() {
+        score++;
     }
 
     /**
      * Set the player state as disconnected. We keep its score to print at the end of the game
      */
-    public void disconnected() {
+    void disconnected() {
         connected = false;
     }
 
@@ -51,28 +49,28 @@ public class Player {
      *
      * @return Boolean the state of the player (if he is connected or not)
      */
-    public boolean isConnected() {
+    boolean isConnected() {
         return connected;
     }
 
     /**
      * @return Integer of the player's score
      */
-    public int getScore() {
+    int getScore() {
         return score;
     }
 
     /**
      * @return Boolean the state of the player (true = clicked on a mine, false = still in game)
      */
-    public boolean isExploded() {
+    boolean isExploded() {
         return exploded;
     }
 
     /**
      * @return String, nickname of the player
      */
-    public String getNickname() {
+    String getNickname() {
         return nickname;
     }
 
@@ -81,7 +79,7 @@ public class Player {
      *
      * @param exploded State of the player : dead or alive
      */
-    public void setExploded(boolean exploded) {
+    void setExploded(boolean exploded) {
         this.exploded = exploded;
     }
 
@@ -90,17 +88,8 @@ public class Player {
      *
      * @param score Integer positive representing the score of the player (
      */
-    public void setScore(int score) {
+    void setScore(int score) {
         this.score = score;
-    }
-
-    /**
-     * Set the state of the player to connected or disconnected
-     *
-     * @param connected A boolean true means that the player is connected, false deconnected
-     */
-    public void setConnected(boolean connected) {
-        this.connected = connected;
     }
 
     /**
@@ -108,7 +97,7 @@ public class Player {
      *
      * @param inGame Boolean of the player state
      */
-    public void setInGame(boolean inGame) {
+    void setInGame(boolean inGame) {
         this.inGame = inGame;
     }
 
@@ -117,16 +106,16 @@ public class Player {
      *
      * @return A boolean of the state of the player (inGame or not)
      */
-    public boolean isInGame() {
+    boolean isInGame() {
         return inGame;
     }
 
     /**
      * Get the player Id
      *
-     * @return Intger of the player ID
+     * @return Integer of the player ID
      */
-    public int getPlayerId() {
+    int getPlayerId() {
         return playerId;
     }
 
@@ -134,7 +123,7 @@ public class Player {
      * Get the output data stream of this player
      * @return The output data stream to the client
      */
-    public DataOutputStream getOut() {
+    DataOutputStream getOut() {
         return out;
     }
 

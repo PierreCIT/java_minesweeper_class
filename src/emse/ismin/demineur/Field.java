@@ -8,14 +8,14 @@ import java.util.Random;
 /**
  * Class which will create the field of the MinesWeeper
  */
-public class Field {
+class Field {
     private static final int DIMEASY = 5;
     private static final int DIMMEDIUM = 20;
     private static final int DIMHARD = 30;
     private static final int NBMINESEASY = 5;
     private static final int NBMINESMEDIUM = 35;
     private static final int NBMINESHARD = 70;
-    public Level level;
+    private Level level;
     private boolean[][] mines;
     private int DimX;
     private int DimY;
@@ -24,34 +24,14 @@ public class Field {
     private int dimXCustom = 5;
     private int dimYCustom = 5;
 
-
-    /**
-     * Default constructor that will initialize a game in the EASY mode
-     */
-    public Field() {
-        this.level = Level.EASY;
-        createChamp(DIMEASY, DIMEASY);
-    }
-
     /**
      * Constructor that takes as input the level of difficulty
      *
      * @param level Enum level that can be EASY, MEDIUM, HARD
      */
-    public Field(Level level) {
+    Field(Level level) {
         this.level = level;
         createChamp(0, 0);
-    }
-
-    /**
-     * Constructor that will tkae as input the dimension of the champ to build (it is custom level difficulty)
-     *
-     * @param DIM1 X dimension
-     * @param DIM2 Y dimension
-     */
-    public Field(int DIM1, int DIM2) {
-        this.level = Level.CUSTOM;
-        createChamp(DIM1, DIM2);
     }
 
     /**
@@ -60,7 +40,7 @@ public class Field {
      * @param DIM1 X dimension
      * @param DIM2 Y dimension
      */
-    public void createChamp(int DIM1, int DIM2) {
+    private void createChamp(int DIM1, int DIM2) {
         if (level == Level.CUSTOM) {
             this.mines = new boolean[DIM1][DIM2];
             placesMines(nbMinesForLevel());
@@ -99,7 +79,6 @@ public class Field {
             return nbMines;
         } else if (level == Level.CUSTOM) {
             nbMines = (dimXCustom * dimYCustom) / 10;
-            ;
             return nbMines;
         } else if (level == Level.HARD) {
             nbMines = NBMINESHARD;
@@ -115,16 +94,16 @@ public class Field {
      *
      * @return Integer of the number of mines
      */
-    public int getNbMines() {
+    int getNbMines() {
         return nbMines;
     }
 
-    public void newGame(Level level) {
+    void newGame(Level level) {
         if (level == this.level) {
             placesMines(nbMinesForLevel()); // We just have to place new mines and remove previous ones
             this.print();
         } else {
-            System.out.println("");
+            System.out.println();
             this.level = level;
             if (this.level == Level.CUSTOM) {
                 getDimsOptionPanel();
@@ -143,11 +122,11 @@ public class Field {
      * @param dimXServer Integer, the dimension of the X axis
      * @param dimYServer Integer, the dimension of the Y axis
      */
-    public void newGame(Level level, int dimXServer, int dimYServer) {
+    void newGame(Level level, int dimXServer, int dimYServer) {
         dimXCustom = dimXServer;
         dimYCustom = dimYServer;
         this.level = level;
-        if (level == Level.CUSTOM) { //This function sould only be called in the case of a Custom level
+        if (level == Level.CUSTOM) { //This function should only be called in the case of a Custom level
             createChamp(dimXServer, dimYServer);
         } else { //Then we should apply the usual newGame creation
             createChamp(0, 0);
@@ -158,7 +137,7 @@ public class Field {
     /**
      * Option panel that will get the customs dimensions of the game and will create champ with those parameters
      */
-    public void getDimsOptionPanel() {
+    void getDimsOptionPanel() {
         JPanel panelOptionDims = new JPanel();
         panelOptionDims.setLayout(new BorderLayout());
         JPanel northPanel = new JPanel();
@@ -197,7 +176,7 @@ public class Field {
      * @param y Integer of the Y position of the case
      * @return Number of mines surrounding the position given by x and y
      */
-    public int numberMinesSurrounding(int x, int y) {
+    int numberMinesSurrounding(int x, int y) {
         int nbMines = 0;
         int borneInfX = x == 0 ? 0 : -1;
         int borneSupX = x == this.mines.length - 1 ? 0 : 1;
@@ -221,7 +200,7 @@ public class Field {
      *
      * @param nbMines Integer number of mines to place in the field
      */
-    public void placesMines(int nbMines) {
+    private void placesMines(int nbMines) {
         for (int x = 0; x < this.mines.length; x++) {
             for (int y = 0; y < this.mines[0].length; y++) {
                 this.mines[x][y] = false;
@@ -241,25 +220,13 @@ public class Field {
     }
 
     /**
-     * R
-     *
-     * @return Champ dimensions
-     */
-    public int[] getDimChamp() {
-        int[] results = new int[2];
-        results[0] = DimX;
-        results[1] = DimY;
-        return results;
-    }
-
-    /**
      * Return the value inside the champ 0 to 8 and x for a mines.
      *
      * @param x Position to ask values from
      * @param y Position to ask values from
      * @return A string value inside the champ 0 to 8 and x for a mines.
      */
-    public String getValeurChamp(int x, int y) {
+    String getValueField(int x, int y) {
         if (mines[x][y]) {
             return "9";
         } else {
@@ -275,7 +242,7 @@ public class Field {
      * @param y Integer y position of the mine
      * @return Boolean true if there is a mine false otherwise.
      */
-    public boolean isMine(int x, int y) {
+    boolean isMine(int x, int y) {
         return mines[x][y];
     }
 
@@ -284,7 +251,7 @@ public class Field {
      *
      * @return Integer
      */
-    public int getDimX() {
+    int getDimX() {
         return DimX;
     }
 
@@ -293,14 +260,14 @@ public class Field {
      *
      * @return Integer
      */
-    public int getDimY() {
+    int getDimY() {
         return DimY;
     }
 
     /**
      * Print the mine position in the console.
      */
-    public void print() {
+    void print() {
         for (int x = 0; x < this.mines.length; x++) {
             for (int y = 0; y < this.mines[0].length; y++) {
                 if (this.mines[x][y]) {
@@ -315,20 +282,20 @@ public class Field {
     }
 
     /**
-     * Get the infomation of the X axis send by the server or local user if in local
+     * Get the information of the X axis send by the server or local user if in local
      *
      * @return Integer of the X axis
      */
-    public int getDimXCustom() {
+    int getDimXCustom() {
         return dimXCustom;
     }
 
     /**
-     * Get the infomation of the Y axis send by the server or local user if in local
+     * Get the information of the Y axis send by the server or local user if in local
      *
      * @return Integer of the Y axis
      */
-    public int getDimYCustom() {
+    int getDimYCustom() {
         return dimYCustom;
     }
 }

@@ -9,8 +9,7 @@ import java.net.UnknownHostException;
  * Class that will handle local and online game of the MinesWeeper
  */
 public class MinesWeeper extends JFrame implements Runnable {
-    public final static String FILENAME = "score.dat";
-    public Level level = Level.EASY;
+    Level level = Level.EASY;
     private Field fieldMines = new Field(level);
     private boolean started = false;
     private GUI panel;
@@ -18,20 +17,18 @@ public class MinesWeeper extends JFrame implements Runnable {
     private int nbCaseClicked = 0;
     private WriteScoreInFile writeLocalScoreInFile = new WriteScoreInFile();
     //Connection
-    public String ipDefault = "127.0.0.1";
-    public int portDefault = 10000;
-    public boolean connected = false;
+    String ipDefault = "127.0.0.1";
+    int portDefault = 10000;
+    boolean connected = false;
     private Socket sock;
     private DataOutputStream out;
     private DataInputStream in;
     private Thread process; //Thread that will listen for server messages
-    private String commmand; // String that will receive commands from the server
     //Online game
     private boolean gameStarted = false; //Boolean that describes the state of the online game
     private boolean onlineGame = false; //Boolean that set is the game is to be played with a server or in local.
     private int dimXCustom = 5; //Value sent by the server regarding the size (X axis) of the custom level
     private int dimYCustom = 5; //Value sent by the server regarding the size (Y axis) of the custom level
-    private int playerId = 0;
 
     /**
      * Constructor of the MinesWeeper which will initialize the game
@@ -47,14 +44,6 @@ public class MinesWeeper extends JFrame implements Runnable {
     }
 
     /**
-     * Method called to exist the program and print an exit message to the player
-     */
-    public void quit() {
-        System.out.println("Closing.... See you soon !");
-        System.exit(0);
-    }
-
-    /**
      * Main of MineWeeper game and the interface.
      *
      * @param args not used
@@ -67,14 +56,14 @@ public class MinesWeeper extends JFrame implements Runnable {
     /**
      * @return The private variable containing the
      */
-    public Field getChamp() {
+    Field getChamp() {
         return fieldMines;
     }
 
     /**
      * @return The state of the game, if true the game is started.
      */
-    public boolean isStarted() {
+    boolean isStarted() {
         return started;
     }
 
@@ -83,7 +72,7 @@ public class MinesWeeper extends JFrame implements Runnable {
      *
      * @param started A boolean if true the game is started and the opposite otherwise.
      */
-    public void setStarted(boolean started) {
+    void setStarted(boolean started) {
         this.started = started;
     }
 
@@ -92,14 +81,14 @@ public class MinesWeeper extends JFrame implements Runnable {
      *
      * @return The gui object of the UI
      */
-    public GUI getGui() {
+    GUI getGui() {
         return this.panel;
     }
 
     /**
      * @return The game state.
      */
-    public boolean isLost() {
+    boolean isLost() {
         return lost;
     }
 
@@ -108,7 +97,7 @@ public class MinesWeeper extends JFrame implements Runnable {
      *
      * @param lost A boolean representing the game state (alive or dead).
      */
-    public void setLost(boolean lost) {
+    void setLost(boolean lost) {
         this.lost = lost;
     }
 
@@ -117,24 +106,15 @@ public class MinesWeeper extends JFrame implements Runnable {
      *
      * @param nbCaseClicked Value to set the number of cases clicked to.
      */
-    public void setNbCaseClicked(int nbCaseClicked) {
+    void setNbCaseClicked(int nbCaseClicked) {
         this.nbCaseClicked = nbCaseClicked;
     }
 
     /**
      * @return the number of cases clicked.
      */
-    public int getNbCaseClicked() {
+    int getNbCaseClicked() {
         return this.nbCaseClicked;
-    }
-
-    /**
-     * Get player id sent by server
-     *
-     * @return Integer of the player ID
-     */
-    public int getPlayerId() {
-        return playerId;
     }
 
     /**
@@ -142,7 +122,7 @@ public class MinesWeeper extends JFrame implements Runnable {
      *
      * @return Integer value of the X axis dimension
      */
-    public int getDimXCustom() {
+    int getDimXCustom() {
         return dimXCustom;
     }
 
@@ -151,7 +131,7 @@ public class MinesWeeper extends JFrame implements Runnable {
      *
      * @return Integer value of the Y axis dimension
      */
-    public int getDimYCustom() {
+    int getDimYCustom() {
         return dimYCustom;
     }
 
@@ -161,14 +141,14 @@ public class MinesWeeper extends JFrame implements Runnable {
      *
      * @return true if the game is won, false otherwise.
      */
-    public boolean isWin() {
+    boolean isWin() {
         return getNbCaseClicked() + getChamp().getNbMines() == getChamp().getDimY() * getChamp().getDimX();
     }
 
     /**
      * Reset the game when the level has to be same as the previous one in the next game.
      */
-    public void newGame() {
+    void newGame() {
         setStarted(false);
         setLost(false);
         setNbCaseClicked(0);
@@ -179,7 +159,7 @@ public class MinesWeeper extends JFrame implements Runnable {
      *
      * @param level Level of the new game.
      */
-    public void newGame(Level level) {
+    void newGame(Level level) {
         this.level = level;
         setStarted(false);
         setLost(false);
@@ -190,17 +170,8 @@ public class MinesWeeper extends JFrame implements Runnable {
     /**
      * Function that will save the game score into a file.
      */
-    public void saveScore(int score) {
+    void saveScore(int score) {
         writeLocalScoreInFile.writeLocalScoreInScoreFile(score, isLost());
-    }
-
-    /**
-     * Give info if the server started the game or not
-     *
-     * @return The sate of the game from the last server update
-     */
-    public boolean isGameStarted() {
-        return gameStarted;
     }
 
     /**
@@ -212,7 +183,7 @@ public class MinesWeeper extends JFrame implements Runnable {
      * @param port     Integer that will the port number used to connect to the server.
      * @param nickname String containing the pseudo/nickname of the player.
      */
-    public void connectServer(String ip, int port, String nickname) {
+    void connectServer(String ip, int port, String nickname) {
         try {
             sock = new Socket(ip, port);
             out = new DataOutputStream(sock.getOutputStream());
@@ -246,7 +217,7 @@ public class MinesWeeper extends JFrame implements Runnable {
      * Disconnect from the server, sends the server the information and reset the interface to be ready to reconnect
      * or to play local game.
      */
-    synchronized public void disconnect() {
+    synchronized void disconnect() {
         onlineGame = false; //Disconnecting from server so the type of game returns to default : local.
         process = null; //We kill the process that was waiting for messages from the server
         noPlayerId();
@@ -278,8 +249,9 @@ public class MinesWeeper extends JFrame implements Runnable {
     public void run() {
         while (process != null) {
             try {
-                commmand = in.readUTF();
-                processCommands(commmand);
+                // String that will receive commands from the server
+                String command = in.readUTF();
+                processCommands(command);
             } catch (IOException e) {
                 if (connected) { //If the state says that we are supposed to be connected then it's a real error
                     e.printStackTrace();
@@ -371,7 +343,7 @@ public class MinesWeeper extends JFrame implements Runnable {
      */
     private void readAndChangeGUIPlayerID() {
         try {
-            playerId = in.readInt();
+            int playerId = in.readInt();
             panel.playerIdUpdate(playerId);
             this.setTitle("Player " + playerId + " | MinesWeeper connected");
         } catch (IOException e) {
@@ -388,7 +360,7 @@ public class MinesWeeper extends JFrame implements Runnable {
     }
 
     /**
-     * Recive new level information from server
+     * Receive new level information from server
      */
     synchronized private void newLevel() {
         try {
@@ -469,17 +441,8 @@ public class MinesWeeper extends JFrame implements Runnable {
      *
      * @return The state of the game. True means that the game is with a server (online)
      */
-    public boolean isOnlineGame() {
+    boolean isOnlineGame() {
         return onlineGame;
-    }
-
-    /**
-     * Set the type of game (online or local)
-     *
-     * @param onlineGame Boolean, true means the state will be put to online game and false to local.
-     */
-    public void setOnlineGame(boolean onlineGame) {
-        this.onlineGame = onlineGame;
     }
 
     /**
@@ -488,7 +451,7 @@ public class MinesWeeper extends JFrame implements Runnable {
      * @param x Integer of the horizontal axe value of the clicked case.
      * @param y Integer of the vertical axe value of the clicked case.
      */
-    public void sendClick(int x, int y) {
+    void sendClick(int x, int y) {
         if (gameStarted) {
             try {
                 out.writeUTF(Commands.POSITION.name()); //Send the command that describe the information that will follow

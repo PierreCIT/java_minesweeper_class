@@ -13,13 +13,13 @@ import java.util.List;
  *
  * @author Pierre
  */
-public class WriteScoreInFile {
+class WriteScoreInFile {
     private final static String dashLine = "---------------------------------------";
 
     WriteScoreInFile() {
     }
 
-    public void writeOnlineScoreInScoreOnlineFile(List<Player> playerList) {
+    void writeOnlineScoreInScoreOnlineFile(List<Player> playerList) {
         File dir = new File("."); //Current directory
         String loc = null;
         try {
@@ -58,7 +58,7 @@ public class WriteScoreInFile {
         }
     }
 
-    public void writeLocalScoreInScoreFile(int score, boolean exploded) {
+    void writeLocalScoreInScoreFile(int score, boolean exploded) {
         File dir = new File("."); //Current directory
         String loc = null;
         try {

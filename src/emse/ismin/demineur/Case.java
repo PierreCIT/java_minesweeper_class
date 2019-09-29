@@ -18,7 +18,7 @@ class Case extends JPanel implements MouseListener {
     private boolean clicked = false;
     private int x;
     private int y;
-    private MinesWeeper demin;
+    private MinesWeeper minesWeeperMain;
     private int value = 0; //Only used when playing online. It will contain the value to show or mines if -1
     private int playerIdClicked = 0; //Only used when playing online. It will contain the id of the player who clicked
 
@@ -34,10 +34,10 @@ class Case extends JPanel implements MouseListener {
     private final static int BLACK = 0x333333;//9
 
 
-    public Case(int x, int y, MinesWeeper demin) {
+    Case(int x, int y, MinesWeeper minesWeeperMain) {
         this.x = x;
         this.y = y;
-        this.demin = demin;
+        this.minesWeeperMain = minesWeeperMain;
         setPreferredSize(new Dimension(DIM, DIM)); //Size of the case
         addMouseListener(this);
     }
@@ -54,8 +54,8 @@ class Case extends JPanel implements MouseListener {
             gc.setColor(new Color(100, 100, 100));
             gc.fillRect(1, 1, getWidth(), getHeight());
         } else {
-            if (!demin.isOnlineGame()) { //Behavior when in local mode
-                if (demin.getChamp().isMine(x, y)) {
+            if (!minesWeeperMain.isOnlineGame()) { //Behavior when in local mode
+                if (minesWeeperMain.getChamp().isMine(x, y)) {
                     try {
                         BufferedImage image = ImageIO.read(new File("img/bomb.png"));
                         gc.drawImage(image, 3, 3, getWidth() - 3, getHeight() - 3, this);
@@ -63,11 +63,11 @@ class Case extends JPanel implements MouseListener {
                         e.printStackTrace();
                     }
                 } else {
-                    gc.setColor(new Color(handleColor(Integer.parseInt(demin.getChamp().getValeurChamp(x, y)))));
+                    gc.setColor(new Color(handleColor(Integer.parseInt(minesWeeperMain.getChamp().getValueField(x, y)))));
                     gc.fillRect(0, 0, getWidth(), getHeight());
                     gc.setColor(new Color(0, 0, 0));
-                    if (Integer.parseInt(demin.getChamp().getValeurChamp(x, y)) != 0) {
-                        gc.drawString(demin.getChamp().getValeurChamp(x, y), getHeight() / 2, getWidth() / 2);
+                    if (Integer.parseInt(minesWeeperMain.getChamp().getValueField(x, y)) != 0) {
+                        gc.drawString(minesWeeperMain.getChamp().getValueField(x, y), getHeight() / 2, getWidth() / 2);
                     }
                 }
             } else { //Behavior when in online mode.
@@ -100,7 +100,7 @@ class Case extends JPanel implements MouseListener {
      * @param nbMinesSurrounding Value to use to get the color
      * @return A constant which refers to a color
      */
-    public int handleColor(int nbMinesSurrounding) {
+    int handleColor(int nbMinesSurrounding) {
         int resultColor;
         switch (nbMinesSurrounding) {
             case 0:
@@ -140,7 +140,7 @@ class Case extends JPanel implements MouseListener {
     /**
      * Set the value of clicked to false and repaint the component.
      */
-    public void newGameCase() {
+    void newGameCase() {
         clicked = false;
         repaint();
     }
@@ -162,49 +162,49 @@ class Case extends JPanel implements MouseListener {
      */
     @Override
     public void mousePressed(MouseEvent e) {
-        if (!demin.isOnlineGame()) { //Behavior when in local game mode.
-            if (!demin.isLost()) {
+        if (!minesWeeperMain.isOnlineGame()) { //Behavior when in local game mode.
+            if (!minesWeeperMain.isLost()) {
                 if (!clicked) {
-                    demin.setNbCaseClicked(demin.getNbCaseClicked() + 1);
+                    minesWeeperMain.setNbCaseClicked(minesWeeperMain.getNbCaseClicked() + 1);
                 }
                 clicked = true;
-                if (!demin.isStarted()) {
-                    demin.getGui().getStopWatch().startCpt();
-                    demin.setStarted(true);
+                if (!minesWeeperMain.isStarted()) {
+                    minesWeeperMain.getGui().getStopWatch().startCpt();
+                    minesWeeperMain.setStarted(true);
                 }
                 repaint(); //Force the call to paintComponents (default behavior)
 
-                if (demin.getChamp().isMine(x, y)) {
-                    demin.setLost(true);
-                    demin.getGui().getStopWatch().stopCpt();
-                    demin.saveScore(demin.getGui().getStopWatch().getScore());
+                if (minesWeeperMain.getChamp().isMine(x, y)) {
+                    minesWeeperMain.setLost(true);
+                    minesWeeperMain.getGui().getStopWatch().stopCpt();
+                    minesWeeperMain.saveScore(minesWeeperMain.getGui().getStopWatch().getScore());
                     int rep = JOptionPane.showConfirmDialog(null, "BOOM ! GAME OVER ! Try " +
                                     "again ! ", "Game Over",
                             JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE);
                     if (rep == JOptionPane.YES_OPTION) {
-                        demin.getGui().newGame(demin.level);
+                        minesWeeperMain.getGui().newGame(minesWeeperMain.level);
                     }
                 } else {
                     //If the case clicked is empty without close bombs then we call the function to show all adjacentValues
-                    if (demin.getChamp().getValeurChamp(x, y).equals("0")) {
-                        demin.getGui().adjacentSameValue(x, y);
+                    if (minesWeeperMain.getChamp().getValueField(x, y).equals("0")) {
+                        minesWeeperMain.getGui().adjacentSameValue(x, y);
                     }
                 }
-                if (demin.isWin()) {
-                    demin.getGui().getStopWatch().stopCpt();
+                if (minesWeeperMain.isWin()) {
+                    minesWeeperMain.getGui().getStopWatch().stopCpt();
                     int rep = JOptionPane.showConfirmDialog(null, "Congratulations ! You WIN " +
-                                    "!!! \nYour score is " + demin.getGui().getStopWatch().getScore() +
+                                    "!!! \nYour score is " + minesWeeperMain.getGui().getStopWatch().getScore() +
                                     "\nWould you like to restart ?", "Congratulations",
                             JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
                     if (rep == JOptionPane.YES_OPTION) {
-                        demin.getGui().newGame(demin.level);
+                        minesWeeperMain.getGui().newGame(minesWeeperMain.level);
                     }
-                    demin.saveScore(demin.getGui().getStopWatch().getScore());
+                    minesWeeperMain.saveScore(minesWeeperMain.getGui().getStopWatch().getScore());
                 }
             }
         } else { //Behavior in online game mode.
-            if (!demin.isLost()) {
-                demin.sendClick(x, y);
+            if (!minesWeeperMain.isLost()) {
+                minesWeeperMain.sendClick(x, y);
             }
         }
     }
@@ -243,9 +243,9 @@ class Case extends JPanel implements MouseListener {
      * Will always set the clicked attribute to true set the number of clicked cases to plus 1
      * And ask for a repaint.
      */
-    public void setClickedTrue() {
+    void setClickedTrue() {
         clicked = true;
-        demin.setNbCaseClicked(demin.getNbCaseClicked() + 1);
+        minesWeeperMain.setNbCaseClicked(minesWeeperMain.getNbCaseClicked() + 1);
         repaint();
     }
 
@@ -254,7 +254,7 @@ class Case extends JPanel implements MouseListener {
      *
      * @return Get the information that the case was clicked
      */
-    public boolean getClicked() {
+    boolean getClicked() {
         return clicked;
     }
 
@@ -264,7 +264,7 @@ class Case extends JPanel implements MouseListener {
      * @param value    Integer of what the case contains (between -1 and 9)
      * @param playerId Integer of the Id of the player who clicked.
      */
-    synchronized public void setClickedTrueAndValueAndPlayerId(int value, int playerId) {
+    synchronized void setClickedTrueAndValueAndPlayerId(int value, int playerId) {
         clicked = true;
         this.value = value;
         this.playerIdClicked = playerId;
