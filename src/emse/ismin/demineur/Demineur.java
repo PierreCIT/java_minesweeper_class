@@ -187,6 +187,7 @@ public class Demineur extends JFrame implements Runnable {
         setStarted(false);
         setLost(false);
         setNbCaseClicked(0);
+        panel.getLabelLevel().setText("Level : " + level.name());
     }
 
     /**
@@ -330,10 +331,12 @@ public class Demineur extends JFrame implements Runnable {
             case "SERVERSTOPPED":
                 gameStarted = false;
                 connected = false;
+                onlineGame = false;
                 panel.getCompteur().stopCpt();
                 panel.addMsgGui("The server has closed.");
                 panel.setNewGameButtonState(true);
                 panel.coDecoButtonChangeText();
+                panel.playerIdUpdate(0);
                 process = null; //Close listening thread
                 noPlayerId();
                 try {

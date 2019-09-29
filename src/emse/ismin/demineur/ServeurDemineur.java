@@ -352,7 +352,7 @@ public class ServeurDemineur extends JFrame implements Runnable {
     /**
      * Send a broadcast message to all connected client to say that the game ended
      */
-    public void gameStopped() {
+    synchronized public void gameStopped() {
         try {
             gameStarted = false;
             for (Player player : playersList) {
@@ -380,11 +380,12 @@ public class ServeurDemineur extends JFrame implements Runnable {
     /**
      * Sends a close server message to all clients and then close the server
      */
-    public void closeServer() {
+    synchronized public void closeServer() {
         try {
             for (Player player : playersList) {
                 if (player.isConnected()) {
                     player.getOut().writeUTF(Commands.SERVERSTOPPED.name()); //Send the command
+                    player.disconnected();
                 }
             }
         } catch (IOException e) {

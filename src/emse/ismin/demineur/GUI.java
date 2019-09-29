@@ -12,7 +12,7 @@ public class GUI extends JPanel implements ActionListener {
     private JButton butQuit;
     private JButton butRestart;
     private JLabel labWelcom;
-    private JLabel labScoreLevel;
+    private JLabel labelLevel;
     private JPanel northPanelLabels;
     private JPanel northPanel;
     private JPanel gridPannel = new JPanel();
@@ -52,14 +52,14 @@ public class GUI extends JPanel implements ActionListener {
 
         //NorthPanel's label
         labWelcom = new JLabel("Welcome on the connected Minesweeper !");
-        labScoreLevel = new JLabel("Score : " + main.score + " , Level : " + main.level, SwingConstants.CENTER);
+        labelLevel = new JLabel("Level : " + main.level, SwingConstants.CENTER);
         northPanel.setLayout(new BorderLayout());
         northPanelLabels.add(labWelcom);
         northPanelLabels.add(compteur); //Adding compteur to northPanel
-        northPanelLabels.add(labScoreLevel);
+        northPanelLabels.add(labelLevel);
         northPanel.add(northPanelLabels, BorderLayout.NORTH);
         labWelcom.setFont(new Font("Papyrus", Font.ITALIC, 12));
-        labScoreLevel.setFont(new Font("Papyrus", Font.ITALIC, 12));
+        labelLevel.setFont(new Font("Papyrus", Font.ITALIC, 12));
 
         //Connection features
         connectPanel = new JPanel();
@@ -147,6 +147,14 @@ public class GUI extends JPanel implements ActionListener {
         mHelp.add(mAbout);
         mAbout.addActionListener(this);
         main.setJMenuBar(menuBar);
+    }
+
+    /**
+     * Get the label that describes the level that must contain "Label : *LEVEL*"
+     * @return A JLabel object
+     */
+    public JLabel getLabelLevel() {
+        return labelLevel;
     }
 
     /**
