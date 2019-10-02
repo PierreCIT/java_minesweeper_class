@@ -1,6 +1,8 @@
 package emse.ismin.demineur;
 
 import javax.swing.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -38,6 +40,13 @@ public class ServerMinesWeeper extends JFrame implements Runnable {
 
         caseClicked = new boolean[mineField.getDimX()][mineField.getDimY()]; //Initialized to all false
         startServer();
+
+        //To do when clicking on the window's 'X' button.
+        this.addWindowListener(new WindowAdapter(){
+            public void windowClosing(WindowEvent e){
+                closeServer();
+            }
+        });
     }
 
     private void startServer() {

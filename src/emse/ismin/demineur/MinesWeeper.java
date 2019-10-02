@@ -1,6 +1,8 @@
 package emse.ismin.demineur;
 
 import javax.swing.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -38,7 +40,20 @@ public class MinesWeeper extends JFrame implements Runnable {
         fieldMines.print();
         panel = new GUI(this);
         setContentPane(panel);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+
+        //To do when clicking on the window's 'X' button.
+        this.addWindowListener(new WindowAdapter(){
+            public void windowClosing(WindowEvent e){
+                if(connected){
+                    panel.addMsgGui("Disconnecting from server....");
+                    disconnect();
+                    panel.addMsgGui("Closing.");
+                    System.exit(0);
+                }
+            }
+        });
+
+
         pack();
         setVisible(true);
     }
