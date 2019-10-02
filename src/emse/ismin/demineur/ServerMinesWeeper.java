@@ -8,6 +8,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -123,14 +125,37 @@ public class ServerMinesWeeper extends JFrame implements Runnable {
                 break;
             case "CLIENTDISCONNECT":
                 getPlayerById(playerId).disconnected(); //Set the player state to disconnected.
-                if (lastPlayerAlive()) {
+                if (lastPlayerAlive() && gameStarted) {
                     playerFinishedGame(playerId);
                     gameStopped();
                 }
                 guiServer.addDialogText("Player " + playerId + " has disconnected.");
+            case "CHATIN":
+                newChatMessage(playerId);
+                break;
             default:
                 break;
         }
+    }
+
+    /**
+     * Handle the message input from client and broadcast it to every player
+     *
+     * @param playerId Integer of the player Id who sent the message.
+     */
+    private void newChatMessage(int playerId) {
+        String msg = "";
+        try {
+            msg = getPlayerById(playerId).getIn().readUTF();
+        } catch (IOException e) {
+            System.out.println("Error while receiving chat message from player : " + playerId);
+            e.printStackTrace();
+        }
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("hh:mm:ss");
+        LocalDateTime now = LocalDateTime.now();
+        String fullMsg = "[" + now + ", " + getPlayerById(playerId).getNickname() + "] " + msg;
+        guiServer.addDialogText(fullMsg);
+        broadcastMSG(fullMsg);
     }
 
     /**

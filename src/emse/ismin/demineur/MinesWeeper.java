@@ -483,5 +483,19 @@ public class MinesWeeper extends JFrame implements Runnable {
             panel.addMsgGui("Game not yet started by server.");
         }
     }
+
+    /**
+     * Send to the server the message fot the chat
+     * @param text String of the message to send to the server
+     */
+    public void sendMessageChat(String text) {
+        try {
+            out.writeUTF(Commands.CHATIN.name());
+            out.writeUTF(text);
+        } catch (IOException e) {
+            System.out.println("Erreur while sending chat information to the server.");
+            e.printStackTrace();
+        }
+    }
 }
 

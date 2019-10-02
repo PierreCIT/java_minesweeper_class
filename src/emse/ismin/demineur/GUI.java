@@ -34,6 +34,7 @@ public class GUI extends JPanel implements ActionListener {
     private JButton coDiscoButton; // Button that will be used to either connect or disconnect from server
     private JPanel connectPanel; //Panel that will contain connection components
     private TextArea msgServer = new TextArea(5, 35); //Text area in which messages from the server will be printed
+    private JTextField inputChatField = new JTextField(20); //Input message for the chat.
 
     /**
      * Create the panels information inside the frame
@@ -97,10 +98,13 @@ public class GUI extends JPanel implements ActionListener {
         //Button at the bottom of the grid
         //Game state features
         JPanel buttonSouth = new JPanel();
+        buttonSouth.setLayout(new BorderLayout());
         msgServer.setEditable(false);
-        buttonSouth.add(msgServer);
-        buttonSouth.add(butRestart);
-        buttonSouth.add(butQuit);
+        inputChatField.addActionListener(this);
+        buttonSouth.add(msgServer, BorderLayout.WEST);
+        buttonSouth.add(butRestart, BorderLayout.CENTER);
+        buttonSouth.add(butQuit, BorderLayout.EAST);
+        buttonSouth.add(inputChatField, BorderLayout.SOUTH);
         this.add(buttonSouth, BorderLayout.SOUTH);
 
         //Menu bar
@@ -209,6 +213,12 @@ public class GUI extends JPanel implements ActionListener {
                 stopWatch.stopCpt();
                 playerIdUpdate(0);
             }
+        else if (e.getSource() == inputChatField) {
+            if (main.isOnlineGame()) {
+                main.sendMessageChat(inputChatField.getText());
+                inputChatField.setText("");
+            }
+        }
     }
 
     private void placeCases() {
