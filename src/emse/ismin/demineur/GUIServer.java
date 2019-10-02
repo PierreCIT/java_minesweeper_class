@@ -14,6 +14,7 @@ public class GUIServer extends JPanel implements ActionListener {
     private JButton closeServerB; // Button to use to close the server and all connections
     private JTextArea dialog = new JTextArea(20, 35); // Dialog/log's server information
     private JComboBox<String> listLevels;
+    private JScrollPane scroll; //Add scroll bar to the dialog textarea
 
     GUIServer(ServerMinesWeeper server) {
         main = server;
@@ -38,7 +39,8 @@ public class GUIServer extends JPanel implements ActionListener {
 
         //Dialog / log data of server
         dialog.setEditable(false);
-        this.add(dialog, BorderLayout.CENTER);
+        scroll = new JScrollPane(dialog);
+        this.add(scroll, BorderLayout.CENTER);
     }
 
     /**
@@ -126,7 +128,15 @@ public class GUIServer extends JPanel implements ActionListener {
      * Get the start/End game button from the server gui
      * @return The JButton object of the GUI
      */
-    public JButton getStartB() {
+    JButton getStartB() {
         return startB;
+    }
+
+    /**
+     * Get the list levels object
+     * @return A JComboBox of the list of levels
+     */
+    JComboBox<String> getListLevels() {
+        return listLevels;
     }
 }

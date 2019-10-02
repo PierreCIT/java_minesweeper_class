@@ -378,6 +378,7 @@ public class ServerMinesWeeper extends JFrame implements Runnable {
             }
             guiServer.addDialogText("Game ended by server.");
             guiServer.getStartB().setText("Start Game");
+            guiServer.getListLevels().setEnabled(true);
         } catch (IOException e) {
             guiServer.addDialogText("Error while sending broadcast :'ENDGAME'.");
             e.printStackTrace();
