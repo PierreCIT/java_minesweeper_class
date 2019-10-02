@@ -14,7 +14,7 @@ import java.io.IOException;
  * It corresponds to one case of the mine field.
  */
 class Case extends JPanel implements MouseListener {
-    private final static int DIM = 50;
+    private final static int DIM = 30;
     private boolean clicked = false;
     private int x;
     private int y;
