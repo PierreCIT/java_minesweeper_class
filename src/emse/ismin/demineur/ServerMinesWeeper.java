@@ -42,8 +42,8 @@ public class ServerMinesWeeper extends JFrame implements Runnable {
         startServer();
 
         //To do when clicking on the window's 'X' button.
-        this.addWindowListener(new WindowAdapter(){
-            public void windowClosing(WindowEvent e){
+        this.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
                 closeServer();
             }
         });
@@ -123,6 +123,10 @@ public class ServerMinesWeeper extends JFrame implements Runnable {
                 break;
             case "CLIENTDISCONNECT":
                 getPlayerById(playerId).disconnected(); //Set the player state to disconnected.
+                if (lastPlayerAlive()) {
+                    playerFinishedGame(playerId);
+                    gameStopped();
+                }
                 guiServer.addDialogText("Player " + playerId + " has disconnected.");
             default:
                 break;
@@ -166,6 +170,7 @@ public class ServerMinesWeeper extends JFrame implements Runnable {
                             }
                         } else {
                             playerFinishedGame(playerId);
+                            gameStopped();
                         }
                     } else {
                         guiServer.addDialogText("Case already clicked : Player " + playerId + " clicked on (X : " + X +
@@ -221,7 +226,7 @@ public class ServerMinesWeeper extends JFrame implements Runnable {
             computeScores();
         } catch (IOException e) {
             guiServer.addDialogText("Error while sending information that a player " + playerId + " finished" +
-                    "the game.");
+                    " the game.");
             e.printStackTrace();
         }
     }
@@ -243,7 +248,7 @@ public class ServerMinesWeeper extends JFrame implements Runnable {
         //Send to all player with maximum score the information that they won.
         for (int i = 0; i < nbMaxValue; i++) {
             try {
-                if(!playersList.get(i).isExploded())
+                if (!playersList.get(i).isExploded())
                     playersList.get(i).getOut().writeUTF(Commands.WIN.name());
             } catch (IOException e) {
                 guiServer.addDialogText("Error while sending 'WIN' command.");
@@ -372,6 +377,7 @@ public class ServerMinesWeeper extends JFrame implements Runnable {
                 deleteDisconnectedPlayers();
             }
             guiServer.addDialogText("Game ended by server.");
+            guiServer.getStartB().setText("Start Game");
         } catch (IOException e) {
             guiServer.addDialogText("Error while sending broadcast :'ENDGAME'.");
             e.printStackTrace();

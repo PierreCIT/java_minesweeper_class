@@ -121,4 +121,12 @@ public class GUIServer extends JPanel implements ActionListener {
             addDialogText("Cannot change 'level' : a game is already started.");
         }
     }
+
+    /**
+     * Get the start/End game button from the server gui
+     * @return The JButton object of the GUI
+     */
+    public JButton getStartB() {
+        return startB;
+    }
 }
