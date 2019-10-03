@@ -151,9 +151,10 @@ public class ServerMinesWeeper extends JFrame implements Runnable {
             System.out.println("Error while receiving chat message from player : " + playerId);
             e.printStackTrace();
         }
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("hh:mm:ss");
+
         LocalDateTime now = LocalDateTime.now();
-        String fullMsg = "[" + now + ", " + getPlayerById(playerId).getNickname() + "] " + msg;
+        String dtf = now.format(DateTimeFormatter.ofPattern("hh:mm:ss"));
+        String fullMsg = "[" + dtf + ", " + getPlayerById(playerId).getNickname() + "] " + msg;
         guiServer.addDialogText(fullMsg);
         broadcastMSG(fullMsg);
     }
