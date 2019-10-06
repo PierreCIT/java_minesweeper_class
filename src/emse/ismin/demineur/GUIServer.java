@@ -1,6 +1,7 @@
 package emse.ismin.demineur;
 
 import javax.swing.*;
+import javax.swing.text.DefaultCaret;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -38,6 +39,8 @@ public class GUIServer extends JPanel implements ActionListener {
 
         //Dialog / log data of server
         dialog.setEditable(false);
+        DefaultCaret caret = (DefaultCaret) dialog.getCaret(); //Set to automatically go to the bottom of text area
+        caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
         //Add scroll bar to the dialog textarea
         JScrollPane scroll = new JScrollPane(dialog);
         this.add(scroll, BorderLayout.CENTER);

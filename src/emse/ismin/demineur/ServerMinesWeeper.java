@@ -130,6 +130,7 @@ public class ServerMinesWeeper extends JFrame implements Runnable {
                     gameStopped();
                 }
                 guiServer.addDialogText("Player " + playerId + " has disconnected.");
+                break;
             case "CHATIN":
                 newChatMessage(playerId);
                 break;
@@ -148,8 +149,10 @@ public class ServerMinesWeeper extends JFrame implements Runnable {
         try {
             msg = getPlayerById(playerId).getIn().readUTF();
         } catch (IOException e) {
-            System.out.println("Error while receiving chat message from player : " + playerId);
-            e.printStackTrace();
+            if (getPlayerById(playerId).isConnected()) {
+                System.out.println("Error while receiving chat message from player : " + playerId);
+                e.printStackTrace();
+            }
         }
 
         LocalDateTime now = LocalDateTime.now();
@@ -400,8 +403,8 @@ public class ServerMinesWeeper extends JFrame implements Runnable {
                 if (player.isConnected() && player.isInGame()) {
                     player.getOut().writeUTF(Commands.ENDGAME.name()); //Send the command
                 }
-                deleteDisconnectedPlayers();
             }
+            deleteDisconnectedPlayers();
             guiServer.addDialogText("Game ended by server.");
             guiServer.getStartB().setText("Start Game");
             guiServer.getListLevels().setEnabled(true);

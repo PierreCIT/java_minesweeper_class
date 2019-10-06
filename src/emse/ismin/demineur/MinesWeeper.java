@@ -485,16 +485,18 @@ public class MinesWeeper extends JFrame implements Runnable {
     }
 
     /**
-     * Send to the server the message fot the chat
+     * Send to the server the message fot the chat, except if the message is empty
      * @param text String of the message to send to the server
      */
-    public void sendMessageChat(String text) {
-        try {
-            out.writeUTF(Commands.CHATIN.name());
-            out.writeUTF(text);
-        } catch (IOException e) {
-            System.out.println("Erreur while sending chat information to the server.");
-            e.printStackTrace();
+    void sendMessageChat(String text) {
+        if(!text.equals("")) {
+            try {
+                out.writeUTF(Commands.CHATIN.name());
+                out.writeUTF(text);
+            } catch (IOException e) {
+                System.out.println("Error while sending chat information to the server.");
+                e.printStackTrace();
+            }
         }
     }
 }

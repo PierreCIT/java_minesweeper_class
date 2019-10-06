@@ -207,7 +207,6 @@ class Case extends JPanel implements MouseListener {
                 }
             }
         } else if (e.getButton() == MouseEvent.BUTTON3) {
-            System.out.println("Left clicked\n");
             leftClicked = true;
             repaint();
         }
