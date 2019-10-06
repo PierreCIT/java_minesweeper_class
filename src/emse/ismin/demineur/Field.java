@@ -13,8 +13,8 @@ class Field {
     private static final int DIMMEDIUM = 20;
     private static final int DIMHARD = 30;
     private static final int NBMINESEASY = 5;
-    private static final int NBMINESMEDIUM = 35;
-    private static final int NBMINESHARD = 70;
+    private static final int NBMINESMEDIUM = 40;
+    private static final int NBMINESHARD = 75;
     private Level level;
     private boolean[][] mines;
     private int DimX;

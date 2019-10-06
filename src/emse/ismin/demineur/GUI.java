@@ -35,6 +35,11 @@ public class GUI extends JPanel implements ActionListener {
     private JPanel connectPanel; //Panel that will contain connection components
     private TextArea msgServer = new TextArea(5, 35); //Text area in which messages from the server will be printed
     private JTextField inputChatField = new JTextField(20); //Input message for the chat.
+    private JPanel chatAndScores = new JPanel(); //Panel that will contain chat information and scores of players
+    private JPanel scorePlayerColumn = new JPanel(); //To put scores in a column
+    private JLabel scoreFirstPlayer = new JLabel(); //Score and nickname of first player
+    private JLabel scoreSecondPlayer = new JLabel(); //Score and nickname of second player
+    private JLabel scoreThirdPlayer = new JLabel(); //Score and nickname of third player
 
     /**
      * Create the panels information inside the frame
@@ -98,14 +103,24 @@ public class GUI extends JPanel implements ActionListener {
         //Button at the bottom of the grid
         //Game state features
         JPanel buttonSouth = new JPanel();
-        buttonSouth.setLayout(new BorderLayout());
         msgServer.setEditable(false);
         inputChatField.addActionListener(this);
-        buttonSouth.add(msgServer, BorderLayout.WEST);
-        buttonSouth.add(butRestart, BorderLayout.CENTER);
-        buttonSouth.add(butQuit, BorderLayout.EAST);
-        buttonSouth.add(inputChatField, BorderLayout.SOUTH);
+        buttonSouth.add(butRestart);
+        buttonSouth.add(butQuit);
         this.add(buttonSouth, BorderLayout.SOUTH);
+
+        //Online right features
+        //Scores
+        scorePlayerColumn.setLayout(new BorderLayout());
+        scorePlayerColumn.add(scoreFirstPlayer, BorderLayout.NORTH);
+        scorePlayerColumn.add(scoreSecondPlayer, BorderLayout.CENTER);
+        scorePlayerColumn.add(scoreThirdPlayer, BorderLayout.SOUTH);
+        chatAndScores.setLayout(new BorderLayout());
+        chatAndScores.add(scorePlayerColumn, BorderLayout.NORTH);
+        chatAndScores.add(msgServer, BorderLayout.CENTER);
+        chatAndScores.add(inputChatField, BorderLayout.SOUTH);
+        chatAndScores.setVisible(false);
+        this.add(chatAndScores, BorderLayout.EAST);
 
         //Menu bar
         JMenuBar menuBar = new JMenuBar();
@@ -114,21 +129,21 @@ public class GUI extends JPanel implements ActionListener {
         menuBar.add(gameMenu);
 
         //Button new game
-        JMenu mNewParty = new JMenu("New Game");
+        JMenu mNewGame = new JMenu("New Game");
         //Button Easy,Medium,Hard
         mEasy = new JMenuItem("Easy");
-        mNewParty.add(mEasy);
+        mNewGame.add(mEasy);
         mEasy.addActionListener(this);
         mMedium = new JMenuItem("Medium");
-        mNewParty.add(mMedium);
+        mNewGame.add(mMedium);
         mMedium.addActionListener(this);
         mHard = new JMenuItem("Hard");
         mHard.addActionListener(this);
-        mNewParty.add(mHard);
+        mNewGame.add(mHard);
         mCustom = new JMenuItem("Custom");
         mCustom.addActionListener(this);
-        mNewParty.add(mCustom);
-        gameMenu.add(mNewParty);
+        mNewGame.add(mCustom);
+        gameMenu.add(mNewGame);
 
 
         //Button quit in the "game" menu
@@ -168,21 +183,24 @@ public class GUI extends JPanel implements ActionListener {
         int rep = JOptionPane.showConfirmDialog(null, "Are you sure ?", "Close confirmation",
                 JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
         if (rep == JOptionPane.YES_OPTION) {
+            if (main.isOnlineGame())
+                main.disconnect();
             System.out.println("Closing... See you soon !");
             System.exit(0);
         }
     }
 
     private void about() {
-        JOptionPane.showConfirmDialog(null, "This is awesome !!!",
+        JOptionPane.showConfirmDialog(null, "It is a school project at the 'Mines Saint-Etienne' cursus ISMIN.\n" +
+                        "It includes regular MinesWeeper rules but also an online version when connected\n" +
+                        "to a server. The server can be launch in local and play multiplayer on the same network.\n" +
+                        "Game created by Pierre Seite.",
                 "About", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == butQuit) {
-            if (main.isOnlineGame())
-                main.disconnect();
             quit();
         } else if (e.getSource() == butRestart) {
             main.getField().newGame(main.level);
@@ -208,10 +226,14 @@ public class GUI extends JPanel implements ActionListener {
         } else if (e.getSource() == coDiscoButton)
             if (!main.connected) {
                 main.connectServer(ipTF.getText(), Integer.parseInt(portTF.getText()), nicknameTF.getText());
+                chatAndScores.setVisible(true);
             } else {
                 main.disconnect();
-                stopWatch.stopCpt();
                 playerIdUpdate(0);
+                chatAndScores.setVisible(false);
+                //Restart the game
+                main.getField().newGame(main.level);
+                newGame();
             }
         else if (e.getSource() == inputChatField) {
             if (main.isOnlineGame()) {
@@ -359,5 +381,32 @@ public class GUI extends JPanel implements ActionListener {
      */
     JButton getButRestart() {
         return butRestart;
+    }
+
+    /**
+     * Get the label of the first player (score related)
+     *
+     * @return The JLabel object of label of the player
+     */
+    public JLabel getScoreFirstPlayer() {
+        return scoreFirstPlayer;
+    }
+
+    /**
+     * Get the label of the second player (score related)
+     *
+     * @return The JLabel object of label of the player
+     */
+    public JLabel getScoreSecondPlayer() {
+        return scoreSecondPlayer;
+    }
+
+    /**
+     * Get the label of the third player (score related)
+     *
+     * @return The JLabel object of label of the player
+     */
+    public JLabel getScoreThirdPlayer() {
+        return scoreThirdPlayer;
     }
 }

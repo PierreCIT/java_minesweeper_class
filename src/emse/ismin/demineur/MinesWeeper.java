@@ -42,9 +42,9 @@ public class MinesWeeper extends JFrame implements Runnable {
         setContentPane(panel);
 
         //To do when clicking on the window's 'X' button.
-        this.addWindowListener(new WindowAdapter(){
-            public void windowClosing(WindowEvent e){
-                if(connected){
+        this.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                if (connected) {
                     panel.addMsgGui("Disconnecting from server....");
                     disconnect();
                     panel.addMsgGui("Closing.");
@@ -298,7 +298,7 @@ public class MinesWeeper extends JFrame implements Runnable {
                 break;
             case "STARTGAME":
                 gameStarted = true;
-                panel.getStopWatch().startCpt();
+                emptyScores();
                 panel.setNewGameButtonState(false);
                 break;
             case "ENDGAME":
@@ -349,9 +349,45 @@ public class MinesWeeper extends JFrame implements Runnable {
                 gameStarted = false;
                 won();
                 break;
+            case "SCORES":
+                manageScores();
+                break;
             default:
                 System.out.println("Error: command from server not understood: " + cmd + "\n");
                 panel.addMsgGui("Error: command from server not understood : " + cmd);
+        }
+    }
+
+    /**
+     * Empty label scores for potential previous games
+     */
+    private void emptyScores() {
+        panel.getScoreFirstPlayer().setText("");
+        panel.getScoreSecondPlayer().setText("");
+        panel.getScoreThirdPlayer().setText("");
+    }
+
+    /**
+     * Will receive scores and print them in the GUI
+     */
+    private void manageScores() {
+        JLabel[] listLabelScores = {panel.getScoreFirstPlayer(), panel.getScoreSecondPlayer(), panel.getScoreThirdPlayer()};
+        for (int i = 0; i < 3; i++) {
+            listLabelScores[i].setText("");
+        }
+        try {
+            int nbPlayer = in.readInt(); //Number of players in game
+            String msg = "";
+            for (int i = 0; i < nbPlayer; i++) {
+                msg = in.readUTF();//Nickname of the player (first)
+                msg += " : ";
+                msg += in.readInt(); //Score
+                listLabelScores[i].setText(msg);
+            }
+
+        } catch (IOException e) {
+            System.out.println("Error while receiving scores !");
+            e.printStackTrace();
         }
     }
 
@@ -485,16 +521,19 @@ public class MinesWeeper extends JFrame implements Runnable {
     }
 
     /**
-     * Send to the server the message fot the chat
+     * Send to the server the message fot the chat, except if the message is empty
+     *
      * @param text String of the message to send to the server
      */
-    public void sendMessageChat(String text) {
-        try {
-            out.writeUTF(Commands.CHATIN.name());
-            out.writeUTF(text);
-        } catch (IOException e) {
-            System.out.println("Erreur while sending chat information to the server.");
-            e.printStackTrace();
+    void sendMessageChat(String text) {
+        if (!text.equals("")) {
+            try {
+                out.writeUTF(Commands.CHATIN.name());
+                out.writeUTF(text);
+            } catch (IOException e) {
+                System.out.println("Error while sending chat information to the server.");
+                e.printStackTrace();
+            }
         }
     }
 }
