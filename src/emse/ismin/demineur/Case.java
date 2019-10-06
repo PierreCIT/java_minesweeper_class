@@ -21,6 +21,7 @@ class Case extends JPanel implements MouseListener {
     private MinesWeeper minesWeeperMain;
     private int value = 0; //Only used when playing online. It will contain the value to show or mines if -1
     private int playerIdClicked = 0; //Only used when playing online. It will contain the id of the player who clicked
+    private boolean leftClicked = false;
 
     private final static int GRAY = 0x9E9E9E; //0
     private final static int BLUE = 0x1547EB; //1
@@ -53,6 +54,11 @@ class Case extends JPanel implements MouseListener {
         if (!clicked) {
             gc.setColor(new Color(100, 100, 100));
             gc.fillRect(1, 1, getWidth(), getHeight());
+            if (leftClicked) {
+                gc.setFont(new Font("default", Font.BOLD, 16));
+                gc.setColor(new Color(200, 0, 0));
+                gc.drawString("?", getHeight() / 2, getWidth() / 2);
+            }
         } else {
             if (!minesWeeperMain.isOnlineGame()) { //Behavior when in local mode
                 if (minesWeeperMain.getField().isMine(x, y)) {
@@ -67,6 +73,7 @@ class Case extends JPanel implements MouseListener {
                     gc.fillRect(0, 0, getWidth(), getHeight());
                     gc.setColor(new Color(0, 0, 0));
                     if (Integer.parseInt(minesWeeperMain.getField().getValueField(x, y)) != 0) {
+                        gc.setFont(new Font("default", Font.BOLD, 16));
                         gc.drawString(minesWeeperMain.getField().getValueField(x, y), getHeight() / 2, getWidth() / 2);
                     }
                 }
@@ -152,51 +159,57 @@ class Case extends JPanel implements MouseListener {
 
     @Override
     public void mousePressed(MouseEvent e) {
-        if (!minesWeeperMain.isOnlineGame()) { //Behavior when in local game mode.
-            if (!minesWeeperMain.isLost()) {
-                if (!clicked) {
-                    minesWeeperMain.setNbCaseClicked(minesWeeperMain.getNbCaseClicked() + 1);
-                }
-                clicked = true;
-                if (!minesWeeperMain.isStarted()) {
-                    minesWeeperMain.getGui().getStopWatch().startCpt();
-                    minesWeeperMain.setStarted(true);
-                }
-                repaint(); //Force the call to paintComponents (default behavior)
+        if (e.getButton() == MouseEvent.BUTTON1) {
+            if (!minesWeeperMain.isOnlineGame()) { //Behavior when in local game mode.
+                if (!minesWeeperMain.isLost()) {
+                    if (!clicked) {
+                        minesWeeperMain.setNbCaseClicked(minesWeeperMain.getNbCaseClicked() + 1);
+                    }
+                    clicked = true;
+                    if (!minesWeeperMain.isStarted()) {
+                        minesWeeperMain.getGui().getStopWatch().startCpt();
+                        minesWeeperMain.setStarted(true);
+                    }
+                    repaint(); //Force the call to paintComponents (default behavior)
 
-                if (minesWeeperMain.getField().isMine(x, y)) {
-                    minesWeeperMain.setLost(true);
-                    minesWeeperMain.getGui().getStopWatch().stopCpt();
-                    minesWeeperMain.saveScore(minesWeeperMain.getGui().getStopWatch().getScore());
-                    int rep = JOptionPane.showConfirmDialog(null, "BOOM ! GAME OVER ! Try " +
-                                    "again ! ", "Game Over",
-                            JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE);
-                    if (rep == JOptionPane.YES_OPTION) {
-                        minesWeeperMain.getField().newGame(minesWeeperMain.level);
-                        minesWeeperMain.getGui().newGame(minesWeeperMain.level);
+                    if (minesWeeperMain.getField().isMine(x, y)) {
+                        minesWeeperMain.setLost(true);
+                        minesWeeperMain.getGui().getStopWatch().stopCpt();
+                        minesWeeperMain.saveScore(minesWeeperMain.getGui().getStopWatch().getScore());
+                        int rep = JOptionPane.showConfirmDialog(null, "BOOM ! GAME OVER ! Try " +
+                                        "again ! ", "Game Over",
+                                JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE);
+                        if (rep == JOptionPane.YES_OPTION) {
+                            minesWeeperMain.getField().newGame(minesWeeperMain.level);
+                            minesWeeperMain.getGui().newGame(minesWeeperMain.level);
+                        }
+                    } else {
+                        //If the case clicked is empty without close bombs then we call the function to show all adjacentValues
+                        if (minesWeeperMain.getField().getValueField(x, y).equals("0")) {
+                            minesWeeperMain.getGui().adjacentSameValue(x, y);
+                        }
                     }
-                } else {
-                    //If the case clicked is empty without close bombs then we call the function to show all adjacentValues
-                    if (minesWeeperMain.getField().getValueField(x, y).equals("0")) {
-                        minesWeeperMain.getGui().adjacentSameValue(x, y);
+                    if (minesWeeperMain.isWin()) {
+                        minesWeeperMain.getGui().getStopWatch().stopCpt();
+                        int rep = JOptionPane.showConfirmDialog(null, "Congratulations ! You WIN " +
+                                        "!!! \nYour score is " + minesWeeperMain.getGui().getStopWatch().getScore() +
+                                        "\nWould you like to restart ?", "Congratulations",
+                                JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
+                        if (rep == JOptionPane.YES_OPTION) {
+                            minesWeeperMain.getGui().newGame(minesWeeperMain.level);
+                        }
+                        minesWeeperMain.saveScore(minesWeeperMain.getGui().getStopWatch().getScore());
                     }
                 }
-                if (minesWeeperMain.isWin()) {
-                    minesWeeperMain.getGui().getStopWatch().stopCpt();
-                    int rep = JOptionPane.showConfirmDialog(null, "Congratulations ! You WIN " +
-                                    "!!! \nYour score is " + minesWeeperMain.getGui().getStopWatch().getScore() +
-                                    "\nWould you like to restart ?", "Congratulations",
-                            JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
-                    if (rep == JOptionPane.YES_OPTION) {
-                        minesWeeperMain.getGui().newGame(minesWeeperMain.level);
-                    }
-                    minesWeeperMain.saveScore(minesWeeperMain.getGui().getStopWatch().getScore());
+            } else { //Behavior in online game mode.
+                if (!minesWeeperMain.isLost()) {
+                    minesWeeperMain.sendClick(x, y);
                 }
             }
-        } else { //Behavior in online game mode.
-            if (!minesWeeperMain.isLost()) {
-                minesWeeperMain.sendClick(x, y);
-            }
+        } else if (e.getButton() == MouseEvent.BUTTON3) {
+            System.out.println("Left clicked\n");
+            leftClicked = true;
+            repaint();
         }
     }
 

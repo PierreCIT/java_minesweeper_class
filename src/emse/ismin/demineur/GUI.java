@@ -174,7 +174,10 @@ public class GUI extends JPanel implements ActionListener {
     }
 
     private void about() {
-        JOptionPane.showConfirmDialog(null, "This is awesome !!!",
+        JOptionPane.showConfirmDialog(null,"It is a school project at the 'Mines Saint-Etienne' cursus ISMIN.\n" +
+                        "It includes regular MinesWeeper rules but also an online version when connected\n" +
+                        "to a server. The server can be launch in local and play multiplayer on the same network.\n" +
+                        "Game created by Pierre Seite.",
                 "About", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE);
     }
 

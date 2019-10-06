@@ -14,7 +14,6 @@ public class GUIServer extends JPanel implements ActionListener {
     private JButton closeServerB; // Button to use to close the server and all connections
     private JTextArea dialog = new JTextArea(20, 35); // Dialog/log's server information
     private JComboBox<String> listLevels;
-    private JScrollPane scroll; //Add scroll bar to the dialog textarea
 
     GUIServer(ServerMinesWeeper server) {
         main = server;
@@ -39,7 +38,8 @@ public class GUIServer extends JPanel implements ActionListener {
 
         //Dialog / log data of server
         dialog.setEditable(false);
-        scroll = new JScrollPane(dialog);
+        //Add scroll bar to the dialog textarea
+        JScrollPane scroll = new JScrollPane(dialog);
         this.add(scroll, BorderLayout.CENTER);
     }
 
