@@ -191,7 +191,7 @@ public class GUI extends JPanel implements ActionListener {
     }
 
     private void about() {
-        JOptionPane.showConfirmDialog(null,"It is a school project at the 'Mines Saint-Etienne' cursus ISMIN.\n" +
+        JOptionPane.showConfirmDialog(null, "It is a school project at the 'Mines Saint-Etienne' cursus ISMIN.\n" +
                         "It includes regular MinesWeeper rules but also an online version when connected\n" +
                         "to a server. The server can be launch in local and play multiplayer on the same network.\n" +
                         "Game created by Pierre Seite.",
@@ -233,10 +233,10 @@ public class GUI extends JPanel implements ActionListener {
                 chatAndScores.setVisible(false);
             }
         else if (e.getSource() == inputChatField) {
-                if (main.isOnlineGame()) {
-                    main.sendMessageChat(inputChatField.getText());
-                    inputChatField.setText("");
-                }
+            if (main.isOnlineGame()) {
+                main.sendMessageChat(inputChatField.getText());
+                inputChatField.setText("");
+            }
         }
     }
 
@@ -378,5 +378,32 @@ public class GUI extends JPanel implements ActionListener {
      */
     JButton getButRestart() {
         return butRestart;
+    }
+
+    /**
+     * Get the label of the first player (score related)
+     *
+     * @return The JLabel object of label of the player
+     */
+    public JLabel getScoreFirstPlayer() {
+        return scoreFirstPlayer;
+    }
+
+    /**
+     * Get the label of the second player (score related)
+     *
+     * @return The JLabel object of label of the player
+     */
+    public JLabel getScoreSecondPlayer() {
+        return scoreSecondPlayer;
+    }
+
+    /**
+     * Get the label of the third player (score related)
+     *
+     * @return The JLabel object of label of the player
+     */
+    public JLabel getScoreThirdPlayer() {
+        return scoreThirdPlayer;
     }
 }

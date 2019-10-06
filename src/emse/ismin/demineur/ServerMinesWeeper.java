@@ -201,6 +201,7 @@ public class ServerMinesWeeper extends JFrame implements Runnable {
                             playerFinishedGame(playerId);
                             gameStopped();
                         }
+                        sendScores();
                     } else {
                         guiServer.addDialogText("Case already clicked : Player " + playerId + " clicked on (X : " + X +
                                 ", Y : " + Y + ").");
@@ -219,12 +220,63 @@ public class ServerMinesWeeper extends JFrame implements Runnable {
     }
 
     /**
+     * Will send current top 3 players nicknames and scores to everyPlayer in Game
+     */
+    synchronized private void sendScores() {
+        playersList.sort(new SortByScore());
+
+        int nbPlayerInGame = nbPlayerInGame();
+        if(nbPlayerInGame>=3){
+            nbPlayerInGame = 3;
+        }
+        for (int i = 0; i < nbPlayerInGame; i++) {
+            for (Player player : playersList) {
+                if (player.isInGame() && player.isConnected()) {
+                    try {
+                        player.getOut().writeUTF(playersList.get(i).getNickname());
+                        player.getOut().writeUTF(playersList.get(i).getNickname());
+                        player.getOut().writeInt(playersList.get(i).getScore());
+                    } catch (IOException e) {
+                        System.out.println("Error while sending scores to player "+ playersList.get(i).getPlayerId());
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Count the number of player in Game
+     *
+     * @return An integer the number of player in game. (Connected or not)
+     */
+    private int nbPlayerInGame() {
+        int count = 0;
+        for (Player player : playersList) {
+            if (player.isInGame()) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    /**
      * Give the information that if the person that click is the last one alive then he is the winner.
      *
      * @return A boolean true if only one player is connected and didn't already lost/exploded/score = -1
      */
     private boolean lastPlayerAlive() {
         int playerConnectedAndAlive = 0;
+        for (Player player : playersList) { //For all output stream saved (broadcast)
+            if (player.isInGame() && !player.isExploded() && player.isConnected()) { //If the player state is still alive
+                try {
+                    player.getOut().writeUTF(Commands.WIN.name()); //Send the command
+                } catch (IOException e) {
+                    System.out.println("Error while sending end of game message to all players in game.");
+                    e.printStackTrace();
+                }
+            }
+        }
         for (Player player : playersList) {
             if (player.isInGame() && player.isConnected() && !player.isExploded()) {
                 playerConnectedAndAlive++;
