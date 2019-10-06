@@ -37,9 +37,9 @@ public class GUI extends JPanel implements ActionListener {
     private JTextField inputChatField = new JTextField(20); //Input message for the chat.
     private JPanel chatAndScores = new JPanel(); //Panel that will contain chat information and scores of players
     private JPanel scorePlayerColumn = new JPanel(); //To put scores in a column
-    private JLabel scoreFirstPlayer = new JLabel("Player 1 : 20"); //Score and nickname of first player
-    private JLabel scoreSecondPlayer = new JLabel("Player 2 : 100"); //Score and nickname of second player
-    private JLabel scoreThirdPlayer = new JLabel("Player 3 : 300"); //Score and nickname of third player
+    private JLabel scoreFirstPlayer = new JLabel(); //Score and nickname of first player
+    private JLabel scoreSecondPlayer = new JLabel(); //Score and nickname of second player
+    private JLabel scoreThirdPlayer = new JLabel(); //Score and nickname of third player
 
     /**
      * Create the panels information inside the frame
@@ -231,6 +231,9 @@ public class GUI extends JPanel implements ActionListener {
                 main.disconnect();
                 playerIdUpdate(0);
                 chatAndScores.setVisible(false);
+                //Restart the game
+                main.getField().newGame(main.level);
+                newGame();
             }
         else if (e.getSource() == inputChatField) {
             if (main.isOnlineGame()) {

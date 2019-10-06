@@ -225,19 +225,36 @@ public class ServerMinesWeeper extends JFrame implements Runnable {
     synchronized private void sendScores() {
         playersList.sort(new SortByScore());
 
+        //Send command
+        for (Player player : playersList) {
+            if (player.isInGame() && player.isConnected()) {
+                try {
+                    player.getOut().writeUTF(Commands.SCORES.name());
+                } catch (IOException e) {
+                    System.out.println("Error while sending 'SCORES' command.");
+                    e.printStackTrace();
+                }
+            }
+        }
         int nbPlayerInGame = nbPlayerInGame();
-        if(nbPlayerInGame>=3){
+        if (nbPlayerInGame >= 3) {
             nbPlayerInGame = 3;
         }
-        for (int i = 0; i < nbPlayerInGame; i++) {
-            for (Player player : playersList) {
-                if (player.isInGame() && player.isConnected()) {
+        for (Player player : playersList) {
+            if (player.isInGame() && player.isConnected()) {
+                try {
+                    player.getOut().writeInt(nbPlayerInGame);
+                } catch (IOException e) {
+                    System.out.println("Error while sending number of scores to actualize.");
+                    e.printStackTrace();
+                }
+                for (int i = 0; i < nbPlayerInGame; i++) {
+
                     try {
-                        player.getOut().writeUTF(playersList.get(i).getNickname());
                         player.getOut().writeUTF(playersList.get(i).getNickname());
                         player.getOut().writeInt(playersList.get(i).getScore());
                     } catch (IOException e) {
-                        System.out.println("Error while sending scores to player "+ playersList.get(i).getPlayerId());
+                        System.out.println("Error while sending scores to player " + playersList.get(i).getPlayerId());
                         e.printStackTrace();
                     }
                 }
@@ -269,16 +286,6 @@ public class ServerMinesWeeper extends JFrame implements Runnable {
         int playerConnectedAndAlive = 0;
         for (Player player : playersList) { //For all output stream saved (broadcast)
             if (player.isInGame() && !player.isExploded() && player.isConnected()) { //If the player state is still alive
-                try {
-                    player.getOut().writeUTF(Commands.WIN.name()); //Send the command
-                } catch (IOException e) {
-                    System.out.println("Error while sending end of game message to all players in game.");
-                    e.printStackTrace();
-                }
-            }
-        }
-        for (Player player : playersList) {
-            if (player.isInGame() && player.isConnected() && !player.isExploded()) {
                 playerConnectedAndAlive++;
             }
         }
@@ -433,6 +440,7 @@ public class ServerMinesWeeper extends JFrame implements Runnable {
      * Send a broadcast message to all connected client to say that the game started
      */
     void gameStarted() {
+        deleteDisconnectedPlayers(); //before a game start we remove disconnected players
         try {
             for (Player player : playersList) {
                 if (player.isConnected()) {

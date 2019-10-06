@@ -298,7 +298,7 @@ public class MinesWeeper extends JFrame implements Runnable {
                 break;
             case "STARTGAME":
                 gameStarted = true;
-                panel.getStopWatch().startCpt();
+                emptyScores();
                 panel.setNewGameButtonState(false);
                 break;
             case "ENDGAME":
@@ -359,23 +359,30 @@ public class MinesWeeper extends JFrame implements Runnable {
     }
 
     /**
+     * Empty label scores for potential previous games
+     */
+    private void emptyScores() {
+        panel.getScoreFirstPlayer().setText("");
+        panel.getScoreSecondPlayer().setText("");
+        panel.getScoreThirdPlayer().setText("");
+    }
+
+    /**
      * Will receive scores and print them in the GUI
      */
     private void manageScores() {
-        JLabel[] listLabelScores = {panel.getScoreFirstPlayer(), panel.getScoreSecondPlayer(), panel.getScoreThirdPlayer()}
+        JLabel[] listLabelScores = {panel.getScoreFirstPlayer(), panel.getScoreSecondPlayer(), panel.getScoreThirdPlayer()};
+        for (int i = 0; i < 3; i++) {
+            listLabelScores[i].setText("");
+        }
         try {
             int nbPlayer = in.readInt(); //Number of players in game
             String msg = "";
             for (int i = 0; i < nbPlayer; i++) {
-                msg += in.readUTF();//Nickname of the player (first)
+                msg = in.readUTF();//Nickname of the player (first)
                 msg += " : ";
                 msg += in.readInt(); //Score
-                listLabelScores[nbPlayer].setText(msg);
-            }
-            if(nbPlayer<3){
-                for (int i = 0; i < 3 - nbPlayer; i++) {
-                    listLabelScores[nbPlayer].setText(msg);
-                }
+                listLabelScores[i].setText(msg);
             }
 
         } catch (IOException e) {
